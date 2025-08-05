@@ -1,0 +1,2892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Status - My Trading Pal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background-color: #0f111a;
+            color: #e2e8f0;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* V35 Sidebar Design - UPDATED */
+        .sidebar {
+            width: 240px;
+            background: #1a1d2e;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: #e2e8f0;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .logo-text {
+            font-size: 18px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 0;
+        }
+
+        .nav-section {
+            margin-bottom: 24px;
+            padding: 0 16px;
+        }
+
+        .nav-section-title {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #64748b;
+            margin-bottom: 8px;
+            padding: 0 8px;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 2px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            color: #e2e8f0;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: #fff;
+        }
+
+        .nav-link.active {
+            background: rgba(102, 126, 234, 0.2);
+            color: #667eea;
+        }
+
+        .nav-link.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 20px;
+            background: #667eea;
+            border-radius: 0 3px 3px 0;
+        }
+
+        .nav-icon {
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .nav-badge {
+            margin-left: auto;
+            background: #667eea;
+            color: white;
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .sidebar-footer {
+            padding: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .sidebar-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 8px;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            color: white;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .user-role {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 240px;
+            flex: 1;
+            padding: 24px;
+            max-width: calc(100% - 240px);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        /* Agent Grid */
+        .agents-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .agent-card {
+            background: #1a1d2e;
+            border-radius: 16px;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .agent-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .agent-card.paused {
+            opacity: 0.7;
+            filter: grayscale(30%);
+        }
+
+        .agent-card.morning::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);
+            border-radius: 16px 16px 0 0;
+        }
+
+        .agent-card.nyopen::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+            border-radius: 16px 16px 0 0;
+        }
+
+        .agent-card.usorb::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+            border-radius: 16px 16px 0 0;
+        }
+
+        .agent-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .agent-info h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .agent-status {
+            color: #9ca3af;
+            font-size: 14px;
+        }
+
+        .agent-activity {
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-monitoring {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .status-trading {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+        }
+
+        .status-waiting {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+        }
+
+        .status-offline {
+            background: rgba(107, 114, 128, 0.2);
+            color: #9ca3af;
+        }
+
+        .agent-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .agent-stat {
+            text-align: center;
+            padding: 12px;
+            background: rgba(55, 65, 81, 0.3);
+            border-radius: 8px;
+        }
+
+        .agent-stat-value {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .agent-stat-label {
+            color: #9ca3af;
+            font-size: 11px;
+        }
+
+        .positive { color: #10b981; }
+        .negative { color: #ef4444; }
+
+        .agent-controls {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .agent-btn {
+            padding: 8px 16px;
+            background: rgba(55, 65, 81, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #e2e8f0;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .agent-btn:hover {
+            background: rgba(102, 126, 234, 0.2);
+            border-color: rgba(102, 126, 234, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .agent-btn:active {
+            transform: translateY(0);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .agent-btn.primary {
+            background: rgba(102, 126, 234, 0.2);
+            border-color: rgba(102, 126, 234, 0.3);
+        }
+
+        .agent-btn.primary:hover {
+            background: rgba(102, 126, 234, 0.3);
+            border-color: rgba(102, 126, 234, 0.5);
+        }
+
+        .agent-chat {
+            background: rgba(31, 41, 55, 0.5);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .agent-message {
+            font-size: 13px;
+            color: #94a3b8;
+            line-height: 1.6;
+            font-style: italic;
+        }
+
+        .agent-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            flex: 1;
+        }
+
+        .action-btn.activate {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .action-btn.pause {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .action-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Performance Section */
+        .performance-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .performance-card {
+            background: #1a1d2e;
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Card Section */
+        .card {
+            background: #1a1d2e;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Expandable Status Items */
+        .expandable-status {
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s ease;
+        }
+
+        .expandable-status:hover {
+            background: rgba(55, 65, 81, 0.5) !important;
+        }
+
+        .status-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, margin-top 0.3s ease;
+            margin-top: 0;
+        }
+
+        .status-details.expanded {
+            max-height: 400px;
+            margin-top: 12px;
+        }
+
+        .status-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(31, 41, 55, 0.3);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .status-table tr {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .status-table tr:last-child {
+            border-bottom: none;
+        }
+
+        .status-table td {
+            padding: 10px 16px;
+            font-size: 12px;
+        }
+
+        .status-table td:first-child {
+            color: #e2e8f0;
+        }
+
+        .status-table td:last-child {
+            text-align: right;
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .expand-icon {
+            transition: transform 0.2s ease;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+
+        .expand-icon.expanded {
+            transform: rotate(180deg);
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #1a1d2e;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: #9ca3af;
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .close-btn:hover {
+            color: #ef4444;
+        }
+
+        .settings-section {
+            margin-bottom: 24px;
+        }
+
+        .settings-section h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .settings-grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: rgba(55, 65, 81, 0.3);
+            border-radius: 8px;
+        }
+
+        .setting-label {
+            font-size: 14px;
+        }
+
+        .setting-value {
+            font-size: 14px;
+            color: #9ca3af;
+        }
+
+        .setting-input {
+            background: rgba(31, 41, 55, 0.5);
+            border: 1px solid rgba(107, 114, 128, 0.3);
+            border-radius: 6px;
+            padding: 6px 12px;
+            color: #e2e8f0;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 150px;
+            width: 100%;
+        }
+
+        select.setting-input {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e2e8f0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            background-size: 16px;
+            padding-right: 32px;
+        }
+
+        .setting-input:hover {
+            border-color: rgba(102, 126, 234, 0.5);
+            background: rgba(31, 41, 55, 0.7);
+        }
+
+        .setting-input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: rgba(31, 41, 55, 0.8);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 48px;
+            height: 24px;
+            background: rgba(107, 114, 128, 0.3);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .toggle-switch.active {
+            background: rgba(16, 185, 129, 0.3);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #9ca3af;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch.active::after {
+            left: 26px;
+            background: #10b981;
+        }
+
+        /* Notification System */
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+
+        .notification-container > * {
+            pointer-events: auto;
+        }
+
+        .notification {
+            background: #1a1d2e;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 12px;
+            padding: 16px 20px;
+            min-width: 300px;
+            max-width: 400px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            animation: slideIn 0.3s ease-out;
+            position: relative;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            opacity: 1;
+            transition: all 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .notification.success {
+            border-color: rgba(16, 185, 129, 0.5);
+            background: #1a1d2e;
+            background-image: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(16, 185, 129, 0.3) 100%);
+        }
+
+        .notification.warning {
+            border-color: rgba(245, 158, 11, 0.5);
+            background: #1a1d2e;
+            background-image: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(245, 158, 11, 0.3) 100%);
+        }
+
+        .notification.info {
+            border-color: rgba(59, 130, 246, 0.5);
+            background: #1a1d2e;
+            background-image: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(59, 130, 246, 0.3) 100%);
+        }
+
+        .notification-icon {
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+            font-size: 15px;
+        }
+
+        .notification-message {
+            font-size: 13px;
+            color: #94a3b8;
+            line-height: 1.5;
+        }
+
+        .notification-close {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: none;
+            border: none;
+            color: #64748b;
+            cursor: pointer;
+            font-size: 18px;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .notification-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e2e8f0;
+        }
+
+        /* Custom Confirm Dialog */
+        .confirm-dialog {
+            background: #1a1d2e;
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 400px;
+            width: 90%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .confirm-dialog h3 {
+            margin-bottom: 16px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .confirm-dialog p {
+            color: #94a3b8;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .confirm-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .confirm-btn {
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+        }
+
+        .confirm-btn.cancel {
+            background: rgba(107, 114, 128, 0.2);
+            color: #e2e8f0;
+            border: 1px solid rgba(107, 114, 128, 0.3);
+        }
+
+        .confirm-btn.confirm {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .confirm-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Chat Interface Styles */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 500px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .chat-message {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .chat-message.user {
+            flex-direction: row-reverse;
+        }
+
+        .chat-icon {
+            width: 32px;
+            height: 32px;
+            background: rgba(102, 126, 234, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .chat-message.user .chat-icon {
+            background: rgba(16, 185, 129, 0.2);
+        }
+
+        .chat-bubble {
+            max-width: 70%;
+            padding: 12px 16px;
+            background: rgba(55, 65, 81, 0.5);
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .chat-message.user .chat-bubble {
+            background: rgba(102, 126, 234, 0.2);
+        }
+
+        .chat-suggestions {
+            padding: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .suggestions-title {
+            font-size: 12px;
+            color: #64748b;
+            margin-bottom: 8px;
+        }
+
+        .suggestion-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .suggestion-chip {
+            padding: 6px 12px;
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 16px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #e2e8f0;
+        }
+
+        .suggestion-chip:hover {
+            background: rgba(102, 126, 234, 0.2);
+            border-color: rgba(102, 126, 234, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .chat-input-container {
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .chat-input {
+            flex: 1;
+            background: rgba(31, 41, 55, 0.5);
+            border: 1px solid rgba(107, 114, 128, 0.3);
+            border-radius: 8px;
+            padding: 10px 16px;
+            color: #e2e8f0;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: rgba(31, 41, 55, 0.7);
+        }
+
+        .chat-send-btn {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chat-send-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        input[type="number"].setting-input {
+            appearance: none;
+            -moz-appearance: textfield;
+        }
+
+        input[type="number"].setting-input::-webkit-inner-spin-button,
+        input[type="number"].setting-input::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .agents-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .agent-stats {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .setting-input {
+                min-width: 120px;
+                font-size: 12px;
+            }
+            
+            .settings-grid {
+                gap: 12px;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 16px;
+            }
+            
+            .header > div {
+                width: 100%;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .header .btn {
+                flex: 1;
+                min-width: 140px;
+            }
+            
+            .modal-content {
+                margin: 20px;
+                max-height: calc(100vh - 40px);
+            }
+            
+            .chat-container {
+                height: 400px;
+            }
+            
+            .suggestion-chips {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        <!-- V35 Sidebar Design - UPDATED -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="logo">
+                    <div class="logo-icon">🤖</div>
+                    <div class="logo-text">My Trading Pal</div>
+                </a>
+            </div>
+            
+            <nav class="nav-container">
+                <!-- MAIN Section -->
+                <div class="nav-section">
+                    <div class="nav-section-title">Main</div>
+                    <ul class="nav-menu">
+                        <li class="nav-item">
+                            <a href="index.html" class="nav-link">
+                                <span class="nav-icon">📊</span>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="trades.html" class="nav-link">
+                                <span class="nav-icon">💹</span>
+                                <span>Trade Management</span>
+                                <span class="nav-badge">3</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="accounts.html" class="nav-link">
+                                <span class="nav-icon">💼</span>
+                                <span>Accounts</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="strategies.html" class="nav-link">
+                                <span class="nav-icon">📈</span>
+                                <span>Strategies</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- AI SYSTEM Section -->
+                <div class="nav-section">
+                    <div class="nav-section-title">AI System</div>
+                    <ul class="nav-menu">
+                        <li class="nav-item">
+                            <a href="ai-status.html" class="nav-link active">
+                                <span class="nav-icon">🤖</span>
+                                <span>AI Status</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="performance.html" class="nav-link">
+                                <span class="nav-icon">📊</span>
+                                <span>Performance</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="risk-monitor.html" class="nav-link">
+                                <span class="nav-icon">🛡️</span>
+                                <span>Risk Monitor</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- ANALYTICS Section -->
+                <div class="nav-section">
+                    <div class="nav-section-title">Analytics</div>
+                    <ul class="nav-menu">
+                        <li class="nav-item">
+                            <a href="reports.html" class="nav-link">
+                                <span class="nav-icon">📑</span>
+                                <span>Reports</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="system-logs.html" class="nav-link">
+                                <span class="nav-icon">🔔</span>
+                                <span>System Logs</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- SETTINGS Section -->
+                <div class="nav-section">
+                    <div class="nav-section-title">Settings</div>
+                    <ul class="nav-menu">
+                        <li class="nav-item">
+                            <a href="settings.html" class="nav-link">
+                                <span class="nav-icon">⚙️</span>
+                                <span>Settings</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="sidebar-user">
+                    <div class="user-avatar">TP</div>
+                    <div class="user-info">
+                        <div class="user-name">Trading Pal</div>
+                        <div class="user-role">Pro Trader</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="header">
+                <h1>🤖 AI Trading Agents</h1>
+                <div style="display: flex; gap: 12px;">
+                    <button class="btn btn-success" onclick="activateAllAgents()">
+                        ⚡ Activate All
+                    </button>
+                    <button class="btn btn-warning" onclick="pauseAllAgents()">
+                        ⏸️ Pause All
+                    </button>
+                    <button class="btn btn-primary" onclick="openAgentSettings()">
+                        ⚙️ Agent Settings
+                    </button>
+                    <button class="btn btn-primary" onclick="exportAllData()" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%);">
+                        📥 Export All Data
+                    </button>
+                </div>
+            </div>
+
+            <!-- AI Agent Cards -->
+            <div class="agents-grid">
+                <!-- Morning Agent -->
+                <div class="agent-card morning">
+                    <div class="agent-header">
+                        <div class="agent-info">
+                            <h3>🌅 Morning Agent</h3>
+                            <div class="agent-status">11:00-14:30 UK • 30M Timeframe</div>
+                        </div>
+                        <div class="agent-activity status-monitoring">MONITORING</div>
+                    </div>
+                    
+                    <div class="agent-stats">
+                        <div class="agent-stat">
+                            <div class="agent-stat-value positive">61.58%</div>
+                            <div class="agent-stat-label">Win Rate</div>
+                        </div>
+                        <div class="agent-stat">
+                            <div class="agent-stat-value">26</div>
+                            <div class="agent-stat-label">Total Trades</div>
+                        </div>
+                        <div class="agent-stat">
+                            <div class="agent-stat-value positive">+$1,240</div>
+                            <div class="agent-stat-label">Total P&L</div>
+                        </div>
+                        <div class="agent-stat">
+                            <div class="agent-stat-value">2.1</div>
+                            <div class="agent-stat-label">Profit Factor</div>
+                        </div>
+                    </div>
+
+                    <div class="agent-controls">
+                        <button class="agent-btn primary" onclick="chatWithAgent('morning')">💬 Chat</button>
+                        <button class="agent-btn" onclick="viewAgentSettings('morning')">⚙️ Settings</button>
+                        <button class="agent-btn" onclick="viewAgentHistory('morning')">📊 History</button>
+                    </div>
+
+                    <div class="agent-chat">
+                        <div class="agent-message">
+                            "Market range forming between 15,245-15,265. Waiting for clean breakout signal with volume confirmation. Risk management parameters optimal."
+                        </div>
+                    </div>
+
+                    <div class="agent-actions">
+                        <button class="action-btn pause" onclick="pauseAgent('morning')">⏸️ Pause Agent</button>
+                    </div>
+                </div>
+
+                <!-- NY Open Agent -->
+                <div class="agent-card nyopen">
+                    <div class="agent-header">
+                        <div class="agent-info">
+                            <h3>🚀 NY Open Agent</h3>
+                            <div class="agent-status">14:30-17:00 UK • 15M Timeframe</div>
+                        </div>
+                        <div class="agent-activity status-monitoring">MONITORING</div>
+                    </div>
+                    
+                    <div class="agent-stats">
+                        <div class="agent-stat">
+                            <div class="agent-stat-value positive">56.25%</div>
+                            <div class="agent-stat-label">Win Rate</div>
+                        </div>
+                        <div class="agent-stat">
+                            <div class="agent-stat-value">18</div>
+                            <div class="agent-stat-label">Total Trades</div>
+                        </div>
+                        <div class="agent-stat">
+                            <div class="agent-stat-value positive">+$865</div>
+                            <div class="agent-stat-label">Total P&L</div>
+                        </div>
+                        <div class="agent-stat">
+                            <div class="agent-stat-value">1.8</div>
+                            <div class="agent-stat-label">Profit Factor</div>
+                        </div>
+                    </div>
+
+                    <div class="agent-controls">
+                        <button class="agent-btn primary" onclick="chatWithAgent('nyopen')">💬 Chat</button>
+                        <button class="agent-btn" onclick="viewAgentSettings('nyopen')">⚙️ Settings</button>
+                        <button class="agent-btn" onclick="viewAgentHistory('nyopen')">📊 History</button>
+                    </div>
+
+                    <div class="agent-chat">
+                        <div class="agent-message">
+                            "MACD showing bullish divergence. Monitoring for NY session momentum. Current market structure favors long setups above 15,280."
+                        </div>
+                    </div>
+
+                    <div class="agent-actions">
+                        <button class="action-btn pause" onclick="pauseAgent('nyopen')">⏸️ Pause Agent</button>
+                    </div>
+                </div>
+
+                <!-- US ORB Agent -->
+                <div class="agent-card usorb">
+                    <div class="agent-header">
+                        <div class="agent-info">
+                            <h3>⭐ US ORB Agent</h3>
+                            <div class="agent-status">14:30-17:00 UK • 5M Timeframe</div>
+                        </div>
+                        <div class="agent-activity status-monitoring">MONITORING</div>
+                    </div>
+                    
+                    <div class="agent-stats">
+                        <div class="agent-stat">
+                            <div class="agent-stat-value positive">71.13%</div>
+                            <div class="agent-stat-label">Win Rate</div>
+                        </div>
+                        <div class="agent-stat">
+                            <div class="agent-stat-value">71</div>
+                            <div class="agent-stat-label">Total Trades</div>
+                        </div>
+                        <div class="agent-stat">
+                            <div class="agent-stat-value positive">+$3,420</div>
+                            <div class="agent-stat-label">Total P&L</div>
+                        </div>
+                        <div class="agent-stat">
+                            <div class="agent-stat-value">2.8</div>
+                            <div class="agent-stat-label">Profit Factor</div>
+                        </div>
+                    </div>
+
+                    <div class="agent-controls">
+                        <button class="agent-btn primary" onclick="chatWithAgent('usorb')">💬 Chat</button>
+                        <button class="agent-btn" onclick="viewAgentSettings('usorb')">⚙️ Settings</button>
+                        <button class="agent-btn" onclick="viewAgentHistory('usorb')">📊 History</button>
+                    </div>
+
+                    <div class="agent-chat">
+                        <div class="agent-message">
+                            "Opening range development in progress. Current range: 15,275-15,285. Will trigger on confirmed break with 2-tick buffer. Volume profile supporting upside."
+                        </div>
+                    </div>
+
+                    <div class="agent-actions">
+                        <button class="action-btn pause" onclick="pauseAgent('usorb')">⏸️ Pause Agent</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Performance Dashboard -->
+            <div class="performance-section">
+                <div class="performance-card">
+                    <div class="section-title">📊 Combined Performance Analysis</div>
+                    <div style="font-size: 14px; line-height: 1.8; color: #94a3b8;">
+                        <strong>🏆 AI Agent Rankings (by Win Rate):</strong><br>
+                        1. ⭐ US ORB Agent - 71.13% (Best ROI)<br>
+                        2. 🌅 Morning Agent - 61.58% (Most Consistent)<br>
+                        3. 🚀 NY Open Agent - 56.25% (MACD Optimized)<br><br>
+                        
+                        <strong>📈 Combined Portfolio Stats:</strong><br>
+                        • Overall Win Rate: 63.2%<br>
+                        • Total Profit Factor: 2.4<br>
+                        • Max Concurrent Risk: 4.2%<br>
+                        • Agent Correlation: Low (0.23)
+                    </div>
+                </div>
+
+                <div class="performance-card">
+                    <div class="section-title">🔧 AI System Status</div>
+                    <div style="display: grid; gap: 12px;">
+                        <div class="expandable-status" onclick="toggleStatusDetails('marketData')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(55, 65, 81, 0.3); border-radius: 8px;">
+                            <div>
+                                <div style="font-weight: 600;">Market Data Feeds</div>
+                                <div style="font-size: 12px; color: #9ca3af;">
+                                    CME: MNQ, ES, NQ • ICE: DX • EUREX: FDAX
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="color: #10b981; font-size: 12px;">5 FEEDS</span>
+                                <span style="color: #10b981;">🟢 LIVE</span>
+                                <span class="expand-icon" id="marketDataIcon">▼</span>
+                            </div>
+                        </div>
+                        <div class="status-details" id="marketDataDetails">
+                            <table class="status-table">
+                                <tr>
+                                    <td>CME: MNQ (Micro E-mini Nasdaq)</td>
+                                    <td>🟢 LIVE</td>
+                                </tr>
+                                <tr>
+                                    <td>CME: ES (E-mini S&P 500)</td>
+                                    <td>🟢 LIVE</td>
+                                </tr>
+                                <tr>
+                                    <td>CME: NQ (E-mini Nasdaq)</td>
+                                    <td>🟢 LIVE</td>
+                                </tr>
+                                <tr>
+                                    <td>ICE: DX (US Dollar Index)</td>
+                                    <td>🟢 LIVE</td>
+                                </tr>
+                                <tr>
+                                    <td>EUREX: FDAX (DAX Futures)</td>
+                                    <td>🟢 LIVE</td>
+                                </tr>
+                            </table>
+                        </div>
+                        
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(55, 65, 81, 0.3); border-radius: 8px;">
+                            <div>
+                                <div style="font-weight: 600;">Strategy Coordination</div>
+                                <div style="font-size: 12px; color: #9ca3af;">Multi-agent system</div>
+                            </div>
+                            <div style="color: #10b981;">🟢 ACTIVE</div>
+                        </div>
+                        
+                        <div class="expandable-status" onclick="toggleStatusDetails('riskManagement')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(55, 65, 81, 0.3); border-radius: 8px; cursor: help;" title="Automated position sizing, stop-loss management, and drawdown protection to preserve capital">
+                            <div>
+                                <div style="font-weight: 600;">Risk Management</div>
+                                <div style="font-size: 12px; color: #9ca3af;">Portfolio protection active</div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="color: #10b981;">🟢 PROTECTED</span>
+                                <span class="expand-icon" id="riskManagementIcon">▼</span>
+                            </div>
+                        </div>
+                        <div class="status-details" id="riskManagementDetails">
+                            <table class="status-table">
+                                <tr>
+                                    <td>Max Drawdown Limit (5%)</td>
+                                    <td>✅ ACTIVE</td>
+                                </tr>
+                                <tr>
+                                    <td>Position Sizing Algorithm</td>
+                                    <td>✅ ACTIVE</td>
+                                </tr>
+                                <tr>
+                                    <td>Correlation-Based Exposure</td>
+                                    <td>✅ ACTIVE</td>
+                                </tr>
+                                <tr>
+                                    <td>Stop-Loss Management</td>
+                                    <td>✅ ACTIVE</td>
+                                </tr>
+                                <tr>
+                                    <td>Volatility-Based Sizing</td>
+                                    <td>✅ ACTIVE</td>
+                                </tr>
+                                <tr>
+                                    <td>Extreme Market Hedge</td>
+                                    <td>✅ ACTIVE</td>
+                                </tr>
+                            </table>
+                        </div>
+                        
+                        <div class="expandable-status" onclick="toggleStatusDetails('executionEngines')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(55, 65, 81, 0.3); border-radius: 8px;">
+                            <div>
+                                <div style="font-weight: 600;">Execution Engines</div>
+                                <div style="font-size: 12px; color: #9ca3af;">
+                                    NinjaTrader • Interactive Brokers • CQG
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="color: #10b981;">🟢 3 CONNECTED</span>
+                                <span class="expand-icon" id="executionEnginesIcon">▼</span>
+                            </div>
+                        </div>
+                        <div class="status-details" id="executionEnginesDetails">
+                            <table class="status-table">
+                                <tr>
+                                    <td>NinjaTrader 8</td>
+                                    <td>🟢 CONNECTED</td>
+                                </tr>
+                                <tr>
+                                    <td>Interactive Brokers TWS</td>
+                                    <td>🟢 CONNECTED</td>
+                                </tr>
+                                <tr>
+                                    <td>CQG Integrated Client</td>
+                                    <td>🟢 CONNECTED</td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <div style="margin-top: 16px; padding: 16px; background: rgba(102, 126, 234, 0.1); border-radius: 8px; border-left: 4px solid #667eea;">
+                            <div style="font-weight: 600; margin-bottom: 8px;">🧠 AI Learning Status</div>
+                            <div style="font-size: 13px; line-height: 1.5;">
+                                • Pattern Recognition: Advanced ML Models<br>
+                                • Market Adaptation: Real-time Neural Networks<br>
+                                • Performance Optimization: Continuous Learning<br>
+                                • Risk Assessment: Multi-factor Analysis<br>
+                                • Last Model Update: 2 hours ago
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agent Coordination Matrix -->
+            <div class="card">
+                <div class="section-title">🎯 Agent Coordination Matrix</div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                    <div style="background: rgba(55, 65, 81, 0.3); padding: 20px; border-radius: 12px;">
+                        <h3 style="margin-bottom: 16px; color: #10b981;">✅ Active Coordinations</h3>
+                        <div style="font-size: 14px; line-height: 1.6;">
+                            • <strong>Conflict Resolution:</strong> US ORB has priority<br>
+                            • <strong>Risk Sharing:</strong> Max 6% portfolio exposure<br>
+                            • <strong>Position Sizing:</strong> Based on win rates<br>
+                            • <strong>Time Coordination:</strong> No overlapping entries<br>
+                            • <strong>Account Distribution:</strong> Balanced allocation<br>
+                            • <strong>Performance Feedback:</strong> Real-time learning
+                        </div>
+                    </div>
+                    
+                    <div style="background: rgba(55, 65, 81, 0.3); padding: 20px; border-radius: 12px;">
+                        <h3 style="margin-bottom: 16px; color: #f59e0b;">⚡ Real-Time Actions</h3>
+                        <div style="font-size: 14px; line-height: 1.6;">
+                            • <strong>Morning Agent:</strong> Monitoring setup<br>
+                            • <strong>NY Open Agent:</strong> Managing position<br>
+                            • <strong>US ORB Agent:</strong> Waiting for range<br>
+                            • <strong>Risk Monitor:</strong> All parameters OK<br>
+                            • <strong>P&L Tracking:</strong> +$365 unrealized<br>
+                            • <strong>Next Decision:</strong> In 3 minutes
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Agent Settings Modal -->
+    <div id="agentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">⚙️ Global AI Agent Settings</h2>
+                <button class="close-btn" onclick="closeModal()">×</button>
+            </div>
+
+            <div class="settings-section">
+                <h3>🎯 Global Risk Management</h3>
+                <div class="settings-grid">
+                    <div class="setting-item">
+                        <span class="setting-label">Risk per Trade</span>
+                        <select class="setting-input" id="riskPerTrade">
+                            <option value="1">1% per position</option>
+                            <option value="2" selected>2% per position</option>
+                            <option value="3">3% per position</option>
+                            <option value="5">5% per position</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <span class="setting-label">Max Daily Loss</span>
+                        <select class="setting-input" id="maxDailyLoss">
+                            <option value="3">3% of account</option>
+                            <option value="5" selected>5% of account</option>
+                            <option value="8">8% of account</option>
+                            <option value="10">10% of account</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <span class="setting-label">Max Concurrent Trades</span>
+                        <select class="setting-input" id="maxConcurrentTrades">
+                            <option value="1">1 position</option>
+                            <option value="2">2 positions</option>
+                            <option value="3" selected>3 positions</option>
+                            <option value="5">5 positions</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <span class="setting-label">Portfolio Heat</span>
+                        <select class="setting-input" id="portfolioHeat">
+                            <option value="4">4% maximum</option>
+                            <option value="6" selected>6% maximum</option>
+                            <option value="8">8% maximum</option>
+                            <option value="10">10% maximum</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3>🤝 Agent Coordination</h3>
+                <div class="settings-grid">
+                    <div class="setting-item">
+                        <span class="setting-label">Conflict Resolution</span>
+                        <select class="setting-input" id="conflictResolution">
+                            <option value="usorb" selected>US ORB Priority</option>
+                            <option value="morning">Morning Priority</option>
+                            <option value="nyopen">NY Open Priority</option>
+                            <option value="first">First Signal Wins</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <span class="setting-label">Signal Sharing</span>
+                        <div class="toggle-switch active" data-setting="signalSharing"></div>
+                    </div>
+                    <div class="setting-item">
+                        <span class="setting-label">Risk Distribution</span>
+                        <div class="toggle-switch active" data-setting="riskDistribution"></div>
+                    </div>
+                    <div class="setting-item">
+                        <span class="setting-label">Performance Sync</span>
+                        <div class="toggle-switch active" data-setting="performanceSync"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3>🧠 AI Learning Parameters</h3>
+                <div class="settings-grid">
+                    <div class="setting-item">
+                        <span class="setting-label">Pattern Recognition</span>
+                        <select class="setting-input" id="patternRecognition">
+                            <option value="basic">Basic Mode</option>
+                            <option value="standard">Standard Mode</option>
+                            <option value="advanced" selected>Advanced Mode</option>
+                            <option value="expert">Expert Mode</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <span class="setting-label">Market Adaptation</span>
+                        <select class="setting-input" id="marketAdaptation">
+                            <option value="slow">Slow</option>
+                            <option value="moderate">Moderate</option>
+                            <option value="realtime" selected>Real-time</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <span class="setting-label">Learning Rate</span>
+                        <select class="setting-input" id="learningRate">
+                            <option value="conservative">Conservative</option>
+                            <option value="moderate">Moderate</option>
+                            <option value="aggressive" selected>Aggressive</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <span class="setting-label">Model Updates</span>
+                        <select class="setting-input" id="modelUpdates">
+                            <option value="1">Every hour</option>
+                            <option value="2" selected>Every 2 hours</option>
+                            <option value="4">Every 4 hours</option>
+                            <option value="8">Every 8 hours</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn btn-primary" onclick="saveAgentSettings()">💾 Save Settings</button>
+                <button class="btn btn-warning" onclick="resetToDefaults()">🔄 Reset to Defaults</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notificationContainer" class="notification-container"></div>
+
+    <!-- Confirm Dialog Modal -->
+    <div id="confirmModal" class="modal">
+        <div class="confirm-dialog">
+            <h3 id="confirmTitle">Confirm Action</h3>
+            <p id="confirmMessage">Are you sure?</p>
+            <div class="confirm-actions">
+                <button class="confirm-btn cancel" onclick="cancelConfirm()">Cancel</button>
+                <button class="confirm-btn confirm" id="confirmButton">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Modal -->
+    <div id="chatModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h2 class="modal-title" id="chatTitle">💬 Chat with Agent</h2>
+                <button class="close-btn" onclick="closeChatModal()">×</button>
+            </div>
+            
+            <div class="chat-container">
+                <div class="chat-messages" id="chatMessages">
+                    <div class="chat-message agent">
+                        <span class="chat-icon">🤖</span>
+                        <div class="chat-bubble">
+                            Hello! I'm your AI trading assistant. How can I help you optimize your trading strategy today?
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chat-suggestions">
+                    <div class="suggestions-title">Quick Commands:</div>
+                    <div class="suggestion-chips">
+                        <button class="suggestion-chip" onclick="sendSuggestion('Show current market analysis')">
+                            📊 Market Analysis
+                        </button>
+                        <button class="suggestion-chip" onclick="sendSuggestion('Explain your last trade decision')">
+                            💡 Last Trade Logic
+                        </button>
+                        <button class="suggestion-chip" onclick="sendSuggestion('Adjust risk parameters')">
+                            ⚙️ Adjust Risk
+                        </button>
+                        <button class="suggestion-chip" onclick="sendSuggestion('Show performance metrics')">
+                            📈 Performance
+                        </button>
+                        <button class="suggestion-chip" onclick="sendSuggestion('What are optimal settings for current market?')">
+                            🎯 Optimal Settings
+                        </button>
+                        <button class="suggestion-chip" onclick="sendSuggestion('Analyze recent losses')">
+                            📉 Loss Analysis
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="chat-input-container">
+                    <input type="text" id="chatInput" class="chat-input" placeholder="Type your message or command..." onkeypress="handleChatKeypress(event)">
+                    <button class="chat-send-btn" onclick="sendChatMessage()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 2L11 13M22 2L15 22L11 13L2 9L22 2Z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Individual Agent Settings Modal -->
+    <div id="agentSettingsModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2 class="modal-title" id="agentSettingsTitle">⚙️ Agent Settings</h2>
+                <button class="close-btn" onclick="closeAgentSettingsModal()">×</button>
+            </div>
+            
+            <div class="settings-section">
+                <h3>📊 Trading Parameters</h3>
+                <div class="settings-grid">
+                    <div class="setting-item">
+                        <span class="setting-label">Timeframe</span>
+                        <select class="setting-input" id="agentTimeframe">
+                            <option value="5M">5 Minutes</option>
+                            <option value="15M">15 Minutes</option>
+                            <option value="30M" selected>30 Minutes</option>
+                            <option value="1H">1 Hour</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <span class="setting-label">Stop Loss (pts)</span>
+                        <input type="number" class="setting-input" id="agentStopLoss" value="15" min="5" max="50">
+                    </div>
+                    <div class="setting-item">
+                        <span class="setting-label">Take Profit (pts)</span>
+                        <input type="number" class="setting-input" id="agentTakeProfit" value="30" min="10" max="100">
+                    </div>
+                    <div class="setting-item">
+                        <span class="setting-label">Trail Stop (pts)</span>
+                        <input type="number" class="setting-input" id="agentTrailStop" value="10" min="5" max="30">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <h3>🎯 Strategy Specific</h3>
+                <div class="settings-grid" id="strategySpecificSettings">
+                    <!-- Dynamic content based on agent type -->
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="btn btn-primary" onclick="saveAgentSpecificSettings()">💾 Save Settings</button>
+                <button class="btn btn-warning" onclick="resetAgentToDefaults()">🔄 Reset to Strategy Defaults</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize global variables
+        window.hasUnsavedChanges = false;
+        
+        // Notification System
+        function showNotification(title, message, type = 'info') {
+            const container = document.getElementById('notificationContainer');
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            
+            const icons = {
+                success: '✅',
+                warning: '⚠️',
+                info: '💡',
+                error: '❌'
+            };
+            
+            notification.innerHTML = `
+                <span class="notification-icon">${icons[type] || '💬'}</span>
+                <div class="notification-content">
+                    <div class="notification-title">${title}</div>
+                    <div class="notification-message">${message}</div>
+                </div>
+                <button class="notification-close" onclick="this.parentElement.remove()">×</button>
+            `;
+            
+            container.appendChild(notification);
+            
+            // Auto remove after 6 seconds
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => notification.remove(), 300);
+            }, 6000);
+        }
+
+        // Custom Confirm Dialog
+        let confirmCallback = null;
+        
+        function showConfirm(title, message, callback) {
+            const modal = document.getElementById('confirmModal');
+            document.getElementById('confirmTitle').innerHTML = title;
+            document.getElementById('confirmMessage').innerHTML = message;
+            confirmCallback = callback;
+            modal.classList.add('show');
+        }
+
+        window.cancelConfirm = function() {
+            document.getElementById('confirmModal').classList.remove('show');
+            if (confirmCallback) confirmCallback(false);
+            confirmCallback = null;
+        }
+
+        document.getElementById('confirmButton').onclick = function() {
+            document.getElementById('confirmModal').classList.remove('show');
+            if (confirmCallback) confirmCallback(true);
+            confirmCallback = null;
+        }
+
+        // Define all functions in the global scope
+        window.chatWithAgent = function(agent) {
+            const agentNames = {
+                'morning': 'Morning Agent',
+                'nyopen': 'NY Open Agent',
+                'usorb': 'US ORB Agent'
+            };
+            
+            // Open chat modal
+            document.getElementById('chatTitle').innerHTML = `💬 Chat with ${agentNames[agent]}`;
+            document.getElementById('chatModal').classList.add('show');
+            
+            // Store current agent for context
+            window.currentChatAgent = agent;
+            
+            // Clear previous messages and add welcome message
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.innerHTML = `
+                <div class="chat-message agent">
+                    <span class="chat-icon">🤖</span>
+                    <div class="chat-bubble">
+                        Hello! I'm your ${agentNames[agent]}. I'm currently monitoring the market with these parameters:<br><br>
+                        📊 Timeframe: ${agent === 'usorb' ? '5M' : agent === 'nyopen' ? '15M' : '30M'}<br>
+                        🎯 Win Rate: ${agent === 'usorb' ? '71.13%' : agent === 'nyopen' ? '56.25%' : '61.58%'}<br>
+                        💰 Total P&L: ${agent === 'usorb' ? '+$3,420' : agent === 'nyopen' ? '+$865' : '+$1,240'}<br><br>
+                        How can I help you optimize your trading today?
+                    </div>
+                </div>
+            `;
+            
+            // Focus on input
+            setTimeout(() => {
+                document.getElementById('chatInput').focus();
+            }, 100);
+        }
+
+        window.closeChatModal = function() {
+            document.getElementById('chatModal').classList.remove('show');
+            window.currentChatAgent = null;
+        }
+
+        window.sendSuggestion = function(text) {
+            document.getElementById('chatInput').value = text;
+            sendChatMessage();
+        }
+
+        window.handleChatKeypress = function(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendChatMessage();
+            }
+        }
+
+        window.sendChatMessage = function() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            const messagesContainer = document.getElementById('chatMessages');
+            
+            // Add user message
+            messagesContainer.innerHTML += `
+                <div class="chat-message user">
+                    <span class="chat-icon">👤</span>
+                    <div class="chat-bubble">${message}</div>
+                </div>
+            `;
+            
+            // Clear input
+            input.value = '';
+            
+            // Simulate agent response
+            setTimeout(() => {
+                const response = generateAgentResponse(message, window.currentChatAgent);
+                messagesContainer.innerHTML += `
+                    <div class="chat-message agent">
+                        <span class="chat-icon">🤖</span>
+                        <div class="chat-bubble">${response}</div>
+                    </div>
+                `;
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }, 1000);
+            
+            // Scroll to bottom
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function generateAgentResponse(message, agent) {
+            const lowerMessage = message.toLowerCase();
+            
+            if (lowerMessage.includes('market analysis') || lowerMessage.includes('current market')) {
+                return `📊 Current Market Analysis:<br><br>
+                • MNQ is showing ${agent === 'morning' ? 'range-bound behavior between 15,245-15,265' : 'bullish momentum above 15,280'}<br>
+                • Volume: ${Math.floor(Math.random() * 5000 + 10000)} contracts<br>
+                • VWAP: 15,${Math.floor(Math.random() * 100 + 250)}<br>
+                • Market Structure: ${agent === 'usorb' ? 'Opening range developing' : 'Trending with pullbacks'}<br><br>
+                🎯 My recommendation: ${agent === 'morning' ? 'Wait for breakout confirmation' : 'Look for long entries on pullbacks'}`;
+            } else if (lowerMessage.includes('last trade') || lowerMessage.includes('explain')) {
+                return `💡 Last Trade Analysis:<br><br>
+                • Entry: 15,${Math.floor(Math.random() * 100 + 200)} (${agent === 'usorb' ? 'ORB breakout' : 'EMA crossover'})<br>
+                • Exit: 15,${Math.floor(Math.random() * 100 + 250)} (Target reached)<br>
+                • Result: +${Math.floor(Math.random() * 30 + 10)} points<br><br>
+                Decision factors:<br>
+                ✅ Strong momentum confirmed<br>
+                ✅ Volume above average<br>
+                ✅ Risk/reward ratio 1:2.5<br>
+                ✅ All indicators aligned`;
+            } else if (lowerMessage.includes('risk') || lowerMessage.includes('adjust')) {
+                return `⚙️ Risk Management Options:<br><br>
+                Current settings:<br>
+                • Risk per trade: 2%<br>
+                • Stop loss: 15 points<br>
+                • Position size: Auto-calculated<br><br>
+                Would you like to:<br>
+                1. Reduce risk to 1.5%?<br>
+                2. Tighten stop loss to 12 points?<br>
+                3. Enable trailing stop?<br><br>
+                💡 Tip: Lower risk in volatile markets`;
+            } else if (lowerMessage.includes('performance') || lowerMessage.includes('metrics')) {
+                return `📈 Performance Metrics:<br><br>
+                Last 7 days:<br>
+                • Trades: ${Math.floor(Math.random() * 10 + 15)}<br>
+                • Win rate: ${agent === 'usorb' ? '73.2%' : agent === 'nyopen' ? '58.1%' : '62.5%'}<br>
+                • Average win: +${Math.floor(Math.random() * 10 + 20)} pts<br>
+                • Average loss: -${Math.floor(Math.random() * 5 + 10)} pts<br>
+                • Profit factor: ${(Math.random() * 1 + 1.5).toFixed(1)}<br><br>
+                🏆 Best day: +${Math.floor(Math.random() * 50 + 100)} points<br>
+                📉 Worst day: -${Math.floor(Math.random() * 20 + 30)} points`;
+            } else if (lowerMessage.includes('optimal') || lowerMessage.includes('settings')) {
+                return `🎯 Optimal Settings for Current Market:<br><br>
+                Based on recent volatility:<br>
+                • Timeframe: ${agent === 'morning' ? '30M (current)' : agent === 'nyopen' ? '15M (current)' : '5M (current)'}<br>
+                • Stop Loss: ${Math.floor(Math.random() * 5 + 12)} points<br>
+                • Take Profit: ${Math.floor(Math.random() * 10 + 25)} points<br>
+                • Trail Stop: Active after +10 pts<br><br>
+                Market conditions: ${Math.random() > 0.5 ? 'Trending' : 'Ranging'}<br>
+                Recommended bias: ${Math.random() > 0.5 ? 'Long' : 'Neutral'}<br><br>
+                💡 These settings showed 68% win rate in backtesting`;
+            } else if (lowerMessage.includes('loss') || lowerMessage.includes('losses')) {
+                return `📉 Recent Loss Analysis:<br><br>
+                Common patterns in losing trades:<br>
+                1. Entries during low volume (45%)<br>
+                2. Against major trend (30%)<br>
+                3. News-related volatility (25%)<br><br>
+                Recommendations:<br>
+                ✅ Add volume filter > 5000<br>
+                ✅ Wait for trend confirmation<br>
+                ✅ Check economic calendar<br>
+                ✅ Reduce size during news<br><br>
+                Implementation would improve win rate by ~8%`;
+            } else {
+                return `I understand you're asking about "${message}".<br><br>
+                I can help you with:<br>
+                • 📊 Real-time market analysis<br>
+                • 💡 Trade decision explanations<br>
+                • ⚙️ Strategy optimization<br>
+                • 📈 Performance metrics<br>
+                • 🎯 Risk management<br><br>
+                Please select one of the quick commands above or ask a specific question about your trading strategy.`;
+            }
+        }
+
+        window.viewAgentSettings = function(agent) {
+            const agentNames = {
+                'morning': 'Morning Agent',
+                'nyopen': 'NY Open Agent',
+                'usorb': 'US ORB Agent'
+            };
+
+            const agentDefaults = {
+                'morning': {
+                    timeframe: '30M',
+                    stopLoss: 15,
+                    takeProfit: 30,
+                    trailStop: 10,
+                    specific: {
+                        'EMA Fast': 20,
+                        'EMA Slow': 50,
+                        'RSI Period': 14,
+                        'RSI Overbought': 70,
+                        'RSI Oversold': 30
+                    }
+                },
+                'nyopen': {
+                    timeframe: '15M',
+                    stopLoss: 12,
+                    takeProfit: 25,
+                    trailStop: 8,
+                    specific: {
+                        'MACD Fast': 12,
+                        'MACD Slow': 26,
+                        'MACD Signal': 9,
+                        'Volume Threshold': 5000
+                    }
+                },
+                'usorb': {
+                    timeframe: '5M',
+                    stopLoss: 10,
+                    takeProfit: 20,
+                    trailStop: 5,
+                    specific: {
+                        'ORB Period': '5 min',
+                        'Breakout Buffer': '2 ticks',
+                        'Min Range': '10 pts',
+                        'Max Range': '30 pts'
+                    }
+                }
+            };
+
+            // Open modal
+            document.getElementById('agentSettingsTitle').innerHTML = `⚙️ ${agentNames[agent]} Settings`;
+            document.getElementById('agentSettingsModal').classList.add('show');
+            
+            // Store current agent
+            window.currentSettingsAgent = agent;
+            window.agentDefaults = agentDefaults[agent];
+            
+            // Load current values
+            const defaults = agentDefaults[agent];
+            document.getElementById('agentTimeframe').value = defaults.timeframe;
+            document.getElementById('agentStopLoss').value = defaults.stopLoss;
+            document.getElementById('agentTakeProfit').value = defaults.takeProfit;
+            document.getElementById('agentTrailStop').value = defaults.trailStop;
+            
+            // Load strategy-specific settings
+            const specificContainer = document.getElementById('strategySpecificSettings');
+            specificContainer.innerHTML = '';
+            
+            for (const [key, value] of Object.entries(defaults.specific)) {
+                specificContainer.innerHTML += `
+                    <div class="setting-item">
+                        <span class="setting-label">${key}</span>
+                        <input type="${typeof value === 'number' ? 'number' : 'text'}" 
+                               class="setting-input strategy-specific" 
+                               data-key="${key}"
+                               value="${value}">
+                    </div>
+                `;
+            }
+        }
+
+        window.closeAgentSettingsModal = function() {
+            document.getElementById('agentSettingsModal').classList.remove('show');
+            window.currentSettingsAgent = null;
+        }
+
+        window.saveAgentSpecificSettings = function() {
+            const agent = window.currentSettingsAgent;
+            const agentNames = {
+                'morning': 'Morning Agent',
+                'nyopen': 'NY Open Agent',
+                'usorb': 'US ORB Agent'
+            };
+            
+            // Collect settings
+            const settings = {
+                timeframe: document.getElementById('agentTimeframe').value,
+                stopLoss: document.getElementById('agentStopLoss').value,
+                takeProfit: document.getElementById('agentTakeProfit').value,
+                trailStop: document.getElementById('agentTrailStop').value,
+                specific: {}
+            };
+            
+            // Collect strategy-specific settings
+            document.querySelectorAll('.strategy-specific').forEach(input => {
+                settings.specific[input.getAttribute('data-key')] = input.value;
+            });
+            
+            showNotification(
+                `💾 ${agentNames[agent]} Settings Saved`,
+                `✅ Timeframe: ${settings.timeframe}<br>
+                ✅ Stop Loss: ${settings.stopLoss} pts<br>
+                ✅ Take Profit: ${settings.takeProfit} pts<br>
+                ✅ Trail Stop: ${settings.trailStop} pts<br><br>
+                🧠 Agent is adapting to new parameters...<br>
+                📊 Strategy will be optimized for these settings`,
+                'success'
+            );
+            
+            console.log('Agent settings saved:', agent, settings);
+            closeAgentSettingsModal();
+        }
+
+        window.resetAgentToDefaults = function() {
+            const agent = window.currentSettingsAgent;
+            const defaults = window.agentDefaults;
+            
+            showConfirm(
+                '🔄 Reset to Strategy Defaults?',
+                `This will restore the optimal default settings for this strategy:<br><br>
+                • Timeframe: ${defaults.timeframe}<br>
+                • Stop Loss: ${defaults.stopLoss} pts<br>
+                • Take Profit: ${defaults.takeProfit} pts<br>
+                • All strategy-specific parameters<br><br>
+                Continue?`,
+                function(confirmed) {
+                    if (confirmed) {
+                        // Reset all fields
+                        document.getElementById('agentTimeframe').value = defaults.timeframe;
+                        document.getElementById('agentStopLoss').value = defaults.stopLoss;
+                        document.getElementById('agentTakeProfit').value = defaults.takeProfit;
+                        document.getElementById('agentTrailStop').value = defaults.trailStop;
+                        
+                        // Reset strategy-specific
+                        for (const [key, value] of Object.entries(defaults.specific)) {
+                            const input = document.querySelector(`[data-key="${key}"]`);
+                            if (input) input.value = value;
+                        }
+                        
+                        showNotification(
+                            '🔄 Settings Reset to Defaults',
+                            'All parameters have been restored to strategy-optimized defaults',
+                            'info'
+                        );
+                    }
+                }
+            );
+        }
+
+        window.viewAgentHistory = function(agent) {
+            const agentNames = {
+                'morning': 'Morning Agent',
+                'nyopen': 'NY Open Agent',
+                'usorb': 'US ORB Agent'
+            };
+
+            // Generate sample historical data
+            const historicalData = generateHistoricalData(agent);
+            
+            // Create custom modal for export options
+            const exportModal = document.createElement('div');
+            exportModal.className = 'modal show';
+            exportModal.innerHTML = `
+                <div class="modal-content" style="max-width: 500px;">
+                    <div class="modal-header">
+                        <h2 class="modal-title">📊 ${agentNames[agent]} Trade History</h2>
+                        <button class="close-btn" onclick="this.closest('.modal').remove()">×</button>
+                    </div>
+                    
+                    <div style="padding: 20px;">
+                        <div style="margin-bottom: 20px;">
+                            <h3 style="margin-bottom: 16px;">Performance Summary:</h3>
+                            <div style="background: rgba(55, 65, 81, 0.3); padding: 16px; border-radius: 8px;">
+                                📈 Total Trades: ${historicalData.totalTrades}<br>
+                                ✅ Winning Trades: ${historicalData.wins}<br>
+                                ❌ Losing Trades: ${historicalData.losses}<br>
+                                🎯 Win Rate: ${historicalData.winRate}%<br>
+                                💰 Net P&L: ${historicalData.netPL}<br>
+                                📊 Profit Factor: ${historicalData.profitFactor}
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h3 style="margin-bottom: 16px;">Export Options:</h3>
+                            <div style="display: grid; gap: 12px;">
+                                <button class="btn btn-primary" onclick="exportTradeHistory('${agent}', 'csv')" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%);">
+                                    📄 Export as CSV
+                                </button>
+                                <button class="btn btn-primary" onclick="exportTradeHistory('${agent}', 'excel')" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%);">
+                                    📊 Export as Excel
+                                </button>
+                                <button class="btn btn-primary" onclick="exportTradeHistory('${agent}', 'pdf')" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%);">
+                                    📑 Export as PDF
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(exportModal);
+            
+            // Store data for export
+            window.currentExportData = historicalData;
+        }
+
+        function generateHistoricalData(agent) {
+            const baseData = {
+                'morning': { trades: 26, winRate: 61.58, avgWin: 22, avgLoss: 15, totalPL: 1240 },
+                'nyopen': { trades: 18, winRate: 56.25, avgWin: 25, avgLoss: 18, totalPL: 865 },
+                'usorb': { trades: 71, winRate: 71.13, avgWin: 18, avgLoss: 12, totalPL: 3420 }
+            };
+            
+            const data = baseData[agent];
+            const wins = Math.round(data.trades * data.winRate / 100);
+            const losses = data.trades - wins;
+            
+            return {
+                totalTrades: data.trades,
+                wins: wins,
+                losses: losses,
+                winRate: data.winRate,
+                netPL: `+$${data.totalPL}`,
+                profitFactor: ((wins * data.avgWin) / (losses * data.avgLoss)).toFixed(1),
+                avgWin: data.avgWin,
+                avgLoss: data.avgLoss,
+                trades: generateSampleTrades(agent, data.trades)
+            };
+        }
+
+        function generateSampleTrades(agent, count) {
+            const trades = [];
+            const today = new Date();
+            
+            for (let i = 0; i < count; i++) {
+                const daysAgo = Math.floor(i / 3); // ~3 trades per day
+                const tradeDate = new Date(today - daysAgo * 24 * 60 * 60 * 1000);
+                const isWin = Math.random() < 0.65; // ~65% win rate
+                
+                trades.push({
+                    date: tradeDate.toISOString().split('T')[0],
+                    time: `${9 + Math.floor(Math.random() * 8)}:${String(Math.floor(Math.random() * 60)).padStart(2, '0')}`,
+                    side: Math.random() > 0.5 ? 'LONG' : 'SHORT',
+                    entry: 15000 + Math.floor(Math.random() * 500),
+                    exit: 15000 + Math.floor(Math.random() * 500),
+                    result: isWin ? Math.floor(Math.random() * 30 + 10) : -Math.floor(Math.random() * 20 + 5),
+                    volume: Math.floor(Math.random() * 10000 + 5000)
+                });
+            }
+            
+            return trades.reverse(); // Most recent first
+        }
+
+        window.exportTradeHistory = function(agent, format) {
+            const data = window.currentExportData;
+            const agentNames = {
+                'morning': 'Morning Agent',
+                'nyopen': 'NY Open Agent',
+                'usorb': 'US ORB Agent'
+            };
+            
+            // Close the export modal
+            document.querySelector('.modal.show').remove();
+            
+            if (format === 'csv') {
+                // Create CSV content
+                let csvContent = 'Date,Time,Side,Entry,Exit,Result (pts),P&L ($),Volume\n';
+                
+                data.trades.forEach(trade => {
+                    const pl = trade.result * 20; // $20 per point
+                    csvContent += `${trade.date},${trade.time},${trade.side},${trade.entry},${trade.exit},${trade.result},${pl},${trade.volume}\n`;
+                });
+                
+                // Add summary at the end
+                csvContent += '\n\nSUMMARY\n';
+                csvContent += `Total Trades,${data.totalTrades}\n`;
+                csvContent += `Wins,${data.wins}\n`;
+                csvContent += `Losses,${data.losses}\n`;
+                csvContent += `Win Rate,${data.winRate}%\n`;
+                csvContent += `Net P&L,${data.netPL}\n`;
+                csvContent += `Profit Factor,${data.profitFactor}\n`;
+                
+                // Create and download file
+                const blob = new Blob([csvContent], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${agent}_agent_history_${new Date().toISOString().split('T')[0]}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+                
+                showNotification(
+                    '📄 CSV Export Complete',
+                    `Trade history for ${agentNames[agent]} has been downloaded as CSV.`,
+                    'success'
+                );
+            } else if (format === 'excel') {
+                showNotification(
+                    '📊 Excel Export Started',
+                    `Preparing Excel file for ${agentNames[agent]}...<br><br>
+                    📊 ${data.totalTrades} trades included<br>
+                    📈 With charts and pivot tables<br>
+                    💾 File: ${agent}_analysis.xlsx`,
+                    'info'
+                );
+                
+                // Simulate Excel generation
+                setTimeout(() => {
+                    showNotification(
+                        '✅ Excel Export Complete',
+                        `${agentNames[agent]} analysis downloaded with advanced Excel features!`,
+                        'success'
+                    );
+                }, 2000);
+            } else if (format === 'pdf') {
+                showNotification(
+                    '📑 PDF Export Started',
+                    `Generating professional PDF report for ${agentNames[agent]}...<br><br>
+                    📊 Performance charts included<br>
+                    📈 Detailed trade analysis<br>
+                    💼 Professional formatting`,
+                    'info'
+                );
+                
+                // Simulate PDF generation
+                setTimeout(() => {
+                    showNotification(
+                        '✅ PDF Export Complete',
+                        `${agentNames[agent]} professional report ready for review!`,
+                        'success'
+                    );
+                }, 2000);
+            }
+        }
+
+        window.pauseAgent = function(agent) {
+            const agentNames = {
+                'morning': 'Morning Agent',
+                'nyopen': 'NY Open Agent',
+                'usorb': 'US ORB Agent'
+            };
+
+            // Find the current button to check its state
+            let currentButton = null;
+            const buttons = document.querySelectorAll('.action-btn');
+            buttons.forEach(btn => {
+                if (btn.onclick && btn.onclick.toString().includes(`'${agent}'`)) {
+                    currentButton = btn;
+                }
+            });
+
+            const isPaused = currentButton && currentButton.textContent.includes('Activate');
+            const agentCard = currentButton.closest('.agent-card');
+
+            if (isPaused) {
+                // Agent is paused, so activate it
+                showNotification(
+                    `▶️ ${agentNames[agent]} ACTIVATED`,
+                    `✅ Signal monitoring resumed<br>
+                    ✅ Automatic trading enabled<br>
+                    ✅ Market scanning active<br>
+                    ✅ Risk protocols engaged<br><br>
+                    📈 Agent is now actively trading!`,
+                    'success'
+                );
+                
+                // Update button
+                currentButton.textContent = '⏸️ Pause Agent';
+                currentButton.classList.remove('activate');
+                currentButton.classList.add('pause');
+                
+                // Update agent status
+                const statusBadge = agentCard.querySelector('.agent-activity');
+                statusBadge.textContent = 'MONITORING';
+                statusBadge.className = 'agent-activity status-monitoring';
+                
+                // Remove paused state from card
+                agentCard.classList.remove('paused');
+            } else {
+                // Agent is active, so pause it
+                showConfirm(
+                    `⏸️ Pause ${agentNames[agent]}?`,
+                    `This will:<br>
+                    ❌ Stop monitoring for new signals<br>
+                    ❌ Disable automatic trading<br>
+                    ✅ Keep existing positions open<br>
+                    ✅ Maintain learning algorithms<br><br>
+                    Agent can be reactivated anytime. Continue?`,
+                    function(confirmed) {
+                        if (confirmed) {
+                            // Update button
+                            currentButton.textContent = '▶️ Activate Agent';
+                            currentButton.classList.remove('pause');
+                            currentButton.classList.add('activate');
+                            
+                            // Update agent status
+                            const statusBadge = agentCard.querySelector('.agent-activity');
+                            statusBadge.textContent = 'PAUSED';
+                            statusBadge.className = 'agent-activity status-offline';
+                            
+                            // Add paused state to card
+                            agentCard.classList.add('paused');
+                            
+                            showNotification(
+                                `⏸️ ${agentNames[agent]} PAUSED`,
+                                `❌ Signal monitoring stopped<br>
+                                ❌ New trade execution disabled<br>
+                                ✅ Existing positions protected<br>
+                                ✅ Ready for quick reactivation<br><br>
+                                ▶️ Use 'Activate' to resume operations`,
+                                'warning'
+                            );
+                        }
+                    }
+                );
+            }
+        }
+
+        window.activateAllAgents = function() {
+            showNotification(
+                '⚡ ALL AI AGENTS ACTIVATED',
+                `🌅 Morning Agent: MONITORING<br>
+                🚀 NY Open Agent: MONITORING<br>
+                ⭐ US ORB Agent: MONITORING<br><br>
+                🤖 Full AI trading system operational<br>
+                📊 All strategies actively scanning<br>
+                🛡️ Risk management protocols active<br>
+                📈 Real-time execution enabled<br><br>
+                🚀 YOUR AI TRADING EMPIRE IS LIVE!`,
+                'success'
+            );
+            
+            // Update all agent statuses
+            document.querySelectorAll('.agent-activity').forEach(status => {
+                status.textContent = 'MONITORING';
+                status.className = 'agent-activity status-monitoring';
+            });
+            
+            // Update all pause/activate buttons
+            document.querySelectorAll('.action-btn').forEach(btn => {
+                if (btn.textContent.includes('Activate Agent')) {
+                    btn.textContent = '⏸️ Pause Agent';
+                    btn.classList.remove('activate');
+                    btn.classList.add('pause');
+                }
+            });
+            
+            // Remove paused state from all agent cards
+            document.querySelectorAll('.agent-card').forEach(card => {
+                card.classList.remove('paused');
+            });
+        }
+
+        window.pauseAllAgents = function() {
+            showConfirm(
+                '⏸️ PAUSE ALL AI AGENTS?',
+                `This will:<br>
+                ❌ Stop ALL agent monitoring<br>
+                ❌ Disable ALL automatic trading<br>
+                ❌ Pause signal generation<br>
+                ✅ Keep existing positions<br>
+                ✅ Maintain system connections<br><br>
+                All agents can be reactivated instantly. Continue?`,
+                function(confirmed) {
+                    if (confirmed) {
+                        showNotification(
+                            '⏸️ ALL AI AGENTS PAUSED',
+                            `❌ Morning Agent: PAUSED<br>
+                            ❌ NY Open Agent: PAUSED<br>
+                            ❌ US ORB Agent: PAUSED<br><br>
+                            🛑 AI trading system in standby mode<br>
+                            📊 Market monitoring reduced<br>
+                            ✅ Positions remain protected<br><br>
+                            ⚡ Use 'Activate All' to resume full operations`,
+                            'warning'
+                        );
+                        
+                        // Update all agent statuses
+                        document.querySelectorAll('.agent-activity').forEach(status => {
+                            status.textContent = 'PAUSED';
+                            status.className = 'agent-activity status-offline';
+                        });
+                        
+                        // Update all pause/activate buttons
+                        document.querySelectorAll('.action-btn').forEach(btn => {
+                            if (btn.textContent.includes('Pause Agent')) {
+                                btn.textContent = '▶️ Activate Agent';
+                                btn.classList.remove('pause');
+                                btn.classList.add('activate');
+                            }
+                        });
+                        
+                        // Add paused state to all agent cards
+                        document.querySelectorAll('.agent-card').forEach(card => {
+                            card.classList.add('paused');
+                        });
+                    }
+                }
+            );
+        }
+
+        window.openAgentSettings = function() {
+            document.getElementById('agentModal').classList.add('show');
+            window.hasUnsavedChanges = false;
+        }
+
+        window.closeModal = function() {
+            if (window.hasUnsavedChanges) {
+                showConfirm(
+                    '⚠️ Unsaved Changes',
+                    'You have unsaved changes in the settings.<br><br>Close without saving?',
+                    function(confirmed) {
+                        if (confirmed) {
+                            document.getElementById('agentModal').classList.remove('show');
+                            window.hasUnsavedChanges = false;
+                        }
+                    }
+                );
+            } else {
+                document.getElementById('agentModal').classList.remove('show');
+            }
+        }
+
+        window.saveAgentSettings = function() {
+            // Collect all settings
+            const settings = {
+                riskPerTrade: document.getElementById('riskPerTrade').value,
+                maxDailyLoss: document.getElementById('maxDailyLoss').value,
+                maxConcurrentTrades: document.getElementById('maxConcurrentTrades').value,
+                portfolioHeat: document.getElementById('portfolioHeat').value,
+                conflictResolution: document.getElementById('conflictResolution').value,
+                patternRecognition: document.getElementById('patternRecognition').value,
+                marketAdaptation: document.getElementById('marketAdaptation').value,
+                learningRate: document.getElementById('learningRate').value,
+                modelUpdates: document.getElementById('modelUpdates').value,
+                toggles: {}
+            };
+            
+            // Collect toggle states
+            document.querySelectorAll('.toggle-switch').forEach(toggle => {
+                const settingName = toggle.getAttribute('data-setting');
+                if (settingName) {
+                    settings.toggles[settingName] = toggle.classList.contains('active');
+                }
+            });
+            
+            showNotification(
+                '💾 AI AGENT SETTINGS SAVED',
+                `✅ Risk per trade: ${settings.riskPerTrade}%<br>
+                ✅ Max daily loss: ${settings.maxDailyLoss}%<br>
+                ✅ Max concurrent: ${settings.maxConcurrentTrades} positions<br>
+                ✅ Portfolio heat: ${settings.portfolioHeat}%<br>
+                ✅ Conflict resolution: ${settings.conflictResolution.toUpperCase()} priority<br><br>
+                🧠 AI system adapting to new settings...<br>
+                📊 Changes will take effect immediately<br>
+                🚀 Optimized performance expected!`,
+                'success'
+            );
+            
+            console.log('Settings saved:', settings);
+            window.hasUnsavedChanges = false;
+            closeModal();
+        }
+
+        window.resetToDefaults = function() {
+            showConfirm(
+                '🔄 Reset all AI agent settings to defaults?',
+                `This will:<br>
+                🔄 Restore original parameters<br>
+                🔄 Reset learning algorithms<br>
+                🔄 Clear custom optimizations<br>
+                🔄 Return to factory settings<br><br>
+                All current optimizations will be lost. Continue?`,
+                function(confirmed) {
+                    if (confirmed) {
+                        // Reset all dropdowns to default values
+                        document.getElementById('riskPerTrade').value = '2';
+                        document.getElementById('maxDailyLoss').value = '5';
+                        document.getElementById('maxConcurrentTrades').value = '3';
+                        document.getElementById('portfolioHeat').value = '6';
+                        document.getElementById('conflictResolution').value = 'usorb';
+                        document.getElementById('patternRecognition').value = 'advanced';
+                        document.getElementById('marketAdaptation').value = 'realtime';
+                        document.getElementById('learningRate').value = 'aggressive';
+                        document.getElementById('modelUpdates').value = '2';
+                        
+                        // Reset all toggle switches to active
+                        document.querySelectorAll('.toggle-switch').forEach(toggle => {
+                            toggle.classList.add('active');
+                        });
+                        
+                        showNotification(
+                            '🔄 SETTINGS RESET TO DEFAULTS',
+                            `✅ Risk parameters: 2% per trade<br>
+                            ✅ Max daily loss: 5%<br>
+                            ✅ Agent coordination: Enabled<br>
+                            ✅ Learning mode: Advanced<br>
+                            ✅ Update frequency: 2 hours<br><br>
+                            📊 Agents will recalibrate over next 24 hours<br>
+                            🎯 Performance may vary during adjustment<br><br>
+                            💡 System ready with factory settings!`,
+                            'info'
+                        );
+                        
+                        window.hasUnsavedChanges = false;
+                    }
+                }
+            );
+        }
+
+        window.exportAllData = function() {
+            // Create export options modal
+            const exportModal = document.createElement('div');
+            exportModal.className = 'modal show';
+            exportModal.innerHTML = `
+                <div class="modal-content" style="max-width: 500px;">
+                    <div class="modal-header">
+                        <h2 class="modal-title">📥 Export All Agent Data</h2>
+                        <button class="close-btn" onclick="this.closest('.modal').remove()">×</button>
+                    </div>
+                    
+                    <div style="padding: 20px;">
+                        <div style="margin-bottom: 20px;">
+                            <h3 style="margin-bottom: 16px;">Export will include:</h3>
+                            <div style="background: rgba(55, 65, 81, 0.3); padding: 16px; border-radius: 8px; line-height: 1.8;">
+                                📊 Complete trade history for all agents<br>
+                                📈 Performance metrics and statistics<br>
+                                ⚙️ Current settings and parameters<br>
+                                🧠 AI learning insights<br>
+                                📅 Date range: Last 30 days
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h3 style="margin-bottom: 16px;">Choose Export Format:</h3>
+                            <div style="display: grid; gap: 12px;">
+                                <button class="btn btn-primary" onclick="performExportAll('csv')" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%);">
+                                    📄 Export as CSV Archive
+                                </button>
+                                <button class="btn btn-primary" onclick="performExportAll('excel')" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%);">
+                                    📊 Export as Excel Workbook
+                                </button>
+                                <button class="btn btn-primary" onclick="performExportAll('pdf')" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%);">
+                                    📑 Export as PDF Report
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(exportModal);
+        }
+
+        window.performExportAll = function(format) {
+            // Close the modal
+            document.querySelector('.modal.show').remove();
+            
+            if (format === 'csv') {
+                showNotification(
+                    '📄 CSV Export Started',
+                    `Preparing comprehensive CSV archive...<br><br>
+                    ✅ Morning Agent: 26 trades<br>
+                    ✅ NY Open Agent: 18 trades<br>
+                    ✅ US ORB Agent: 71 trades<br><br>
+                    📦 File: MyTradingPal_CSV_${new Date().toISOString().split('T')[0]}.zip`,
+                    'info'
+                );
+                
+                setTimeout(() => {
+                    showNotification(
+                        '✅ CSV Export Complete',
+                        'All agent data exported as CSV files in ZIP archive!',
+                        'success'
+                    );
+                }, 2000);
+            } else if (format === 'excel') {
+                showNotification(
+                    '📊 Excel Export Started',
+                    `Creating comprehensive Excel workbook...<br><br>
+                    📑 Sheet 1: Morning Agent Analysis<br>
+                    📑 Sheet 2: NY Open Agent Analysis<br>
+                    📑 Sheet 3: US ORB Agent Analysis<br>
+                    📑 Sheet 4: Combined Performance<br>
+                    📊 With charts, pivot tables, and formulas<br><br>
+                    💾 File: MyTradingPal_Analysis.xlsx`,
+                    'info'
+                );
+                
+                setTimeout(() => {
+                    showNotification(
+                        '✅ Excel Export Complete',
+                        'Professional Excel workbook with all trading data ready!',
+                        'success'
+                    );
+                }, 2500);
+            } else if (format === 'pdf') {
+                showNotification(
+                    '📑 PDF Report Generation',
+                    `Creating professional trading report...<br><br>
+                    📊 Executive Summary<br>
+                    📈 Performance Charts<br>
+                    💹 Individual Agent Analysis<br>
+                    🎯 Risk Metrics<br>
+                    💡 AI Insights & Recommendations<br><br>
+                    📄 50+ page comprehensive report`,
+                    'info'
+                );
+                
+                setTimeout(() => {
+                    showNotification(
+                        '✅ PDF Report Complete',
+                        'Professional trading report ready for presentation!',
+                        'success'
+                    );
+                }, 3000);
+            }
+        }
+
+        window.toggleStatusDetails = function(section) {
+            const details = document.getElementById(section + 'Details');
+            const icon = document.getElementById(section + 'Icon');
+            
+            if (details.classList.contains('expanded')) {
+                details.classList.remove('expanded');
+                icon.classList.remove('expanded');
+            } else {
+                // Close other sections first
+                ['marketData', 'riskManagement', 'executionEngines'].forEach(s => {
+                    if (s !== section) {
+                        const otherDetails = document.getElementById(s + 'Details');
+                        const otherIcon = document.getElementById(s + 'Icon');
+                        if (otherDetails) otherDetails.classList.remove('expanded');
+                        if (otherIcon) otherIcon.classList.remove('expanded');
+                    }
+                });
+                
+                // Open clicked section
+                details.classList.add('expanded');
+                icon.classList.add('expanded');
+            }
+        }
+
+        // Toggle switch functionality
+        function setupToggleSwitches() {
+            document.querySelectorAll('.toggle-switch').forEach(toggle => {
+                toggle.addEventListener('click', function() {
+                    this.classList.toggle('active');
+                    const label = this.closest('.setting-item').querySelector('.setting-label').textContent;
+                    const isActive = this.classList.contains('active');
+                    const settingName = this.getAttribute('data-setting');
+                    console.log(`Toggle ${label} (${settingName}): ${isActive ? 'ON' : 'OFF'}`);
+                    window.hasUnsavedChanges = true;
+                });
+            });
+        }
+
+        // Track settings changes
+        function setupSettingsTracking() {
+            window.hasUnsavedChanges = false;
+            
+            // Track dropdown changes
+            document.querySelectorAll('.setting-input').forEach(input => {
+                input.addEventListener('change', function() {
+                    window.hasUnsavedChanges = true;
+                    console.log('Setting changed:', this.id, '=', this.value);
+                });
+            });
+        }
+
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+A: Activate all agents
+            if (e.ctrlKey && e.key === 'a') {
+                e.preventDefault();
+                activateAllAgents();
+            }
+            // Ctrl+P: Pause all agents
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                pauseAllAgents();
+            }
+            // Escape: Close modals
+            if (e.key === 'Escape') {
+                const confirmModalVisible = document.getElementById('confirmModal').classList.contains('show');
+                const agentModalVisible = document.getElementById('agentModal').classList.contains('show');
+                const chatModalVisible = document.getElementById('chatModal').classList.contains('show');
+                const agentSettingsModalVisible = document.getElementById('agentSettingsModal').classList.contains('show');
+                
+                if (confirmModalVisible) {
+                    cancelConfirm();
+                } else if (chatModalVisible) {
+                    closeChatModal();
+                } else if (agentSettingsModalVisible) {
+                    closeAgentSettingsModal();
+                } else if (agentModalVisible) {
+                    closeModal();
+                }
+            }
+        });
+
+        // Modal click outside to close
+        document.addEventListener('click', function(e) {
+            const agentModal = document.getElementById('agentModal');
+            const confirmModal = document.getElementById('confirmModal');
+            const chatModal = document.getElementById('chatModal');
+            const agentSettingsModal = document.getElementById('agentSettingsModal');
+            
+            if (e.target === agentModal) {
+                closeModal();
+            }
+            if (e.target === confirmModal) {
+                cancelConfirm();
+            }
+            if (e.target === chatModal) {
+                closeChatModal();
+            }
+            if (e.target === agentSettingsModal) {
+                closeAgentSettingsModal();
+            }
+        });
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🤖 AI Trading Agents initialized');
+            console.log('📊 Real-time monitoring active');
+            console.log('🚀 System ready for trading');
+            
+            // Setup toggle switches
+            setupToggleSwitches();
+            
+            // Setup settings tracking
+            setupSettingsTracking();
+            
+            // Test notification system
+            setTimeout(() => {
+                showNotification(
+                    '🚀 AI System Ready',
+                    'All trading agents initialized and ready for action! Click on Market Data, Risk Management, or Execution Engines to expand details.',
+                    'success'
+                );
+            }, 1000);
+            
+            // Initialize expandable sections
+            ['marketData', 'riskManagement', 'executionEngines'].forEach(section => {
+                const details = document.getElementById(section + 'Details');
+                const icon = document.getElementById(section + 'Icon');
+                if (details && icon) {
+                    details.classList.remove('expanded');
+                    icon.classList.remove('expanded');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

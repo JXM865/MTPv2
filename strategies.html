@@ -1,0 +1,1883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Trading Pal - Strategies</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #0a0a0a;
+            color: #e5e7eb;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 260px;
+            height: 100vh;
+            background: linear-gradient(to bottom, #111827, #0a0a0a);
+            border-right: 1px solid #1f2937;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .logo {
+            padding: 24px;
+            font-size: 20px;
+            font-weight: 700;
+            color: #667eea;
+            border-bottom: 1px solid #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-section {
+            padding: 16px 0;
+        }
+
+        .nav-section-title {
+            padding: 8px 24px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 24px;
+            color: #9ca3af;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+
+        .nav-item:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: #e5e7eb;
+        }
+
+        .nav-item.active {
+            background: rgba(102, 126, 234, 0.2);
+            color: #667eea;
+            border-left: 3px solid #667eea;
+        }
+
+        .nav-icon {
+            font-size: 18px;
+        }
+
+        /* Mobile Menu Toggle */
+        .menu-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: #1f2937;
+            border: 1px solid #374151;
+            color: #e5e7eb;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0 !important;
+            }
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 260px;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            padding: 32px;
+            border-bottom: 1px solid #374151;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(to right, #e5e7eb, #9ca3af);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
+
+        /* Strategy Grid */
+        .strategy-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 24px;
+            padding: 32px;
+        }
+
+        /* Strategy Card */
+        .strategy-card {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            border: 1px solid #374151;
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .strategy-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.1);
+        }
+
+        .strategy-card.morning {
+            border-top: 3px solid #f59e0b;
+        }
+
+        .strategy-card.nyopen {
+            border-top: 3px solid #3b82f6;
+        }
+
+        .strategy-card.usorb {
+            border-top: 3px solid #10b981;
+        }
+
+        .strategy-card.paused {
+            opacity: 0.8;
+        }
+
+        .strategy-card.paused::after {
+            content: '⏸️';
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 32px;
+            opacity: 0.2;
+        }
+
+        .strategy-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .strategy-title {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .strategy-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .status-monitoring {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+        }
+
+        .status-waiting {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+        }
+
+        .status-paused {
+            background: rgba(107, 114, 128, 0.2);
+            color: #9ca3af;
+        }
+
+        /* Strategy Stats */
+        .strategy-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
+        .positive {
+            color: #10b981;
+        }
+
+        .negative {
+            color: #ef4444;
+        }
+
+        /* Strategy Description */
+        .strategy-description {
+            padding: 16px;
+            background: rgba(55, 65, 81, 0.3);
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .strategy-description.morning {
+            border-left: 3px solid #f59e0b;
+        }
+
+        .strategy-description.nyopen {
+            border-left: 3px solid #3b82f6;
+        }
+
+        .strategy-description.usorb {
+            border-left: 3px solid #10b981;
+        }
+
+        /* Trade Opportunities */
+        .trade-opportunities {
+            border-top: 1px solid #374151;
+            padding-top: 16px;
+        }
+
+        .opportunities-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #9ca3af;
+        }
+
+        .trade-opportunity {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: rgba(55, 65, 81, 0.2);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .trade-time {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .trade-status {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .status-ready {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .status-pending {
+            background: rgba(102, 126, 234, 0.2);
+            color: #667eea;
+        }
+
+        /* Recent Executions */
+        .card {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            border: 1px solid #374151;
+            border-radius: 16px;
+            padding: 24px;
+            margin: 0 32px 32px 32px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .execution-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .execution-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            background: rgba(55, 65, 81, 0.3);
+            border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .execution-item:hover {
+            background: rgba(55, 65, 81, 0.5);
+        }
+
+        .execution-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 20px;
+        }
+
+        .execution-icon.buy {
+            background: rgba(16, 185, 129, 0.2);
+        }
+
+        .execution-icon.sell {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .execution-icon.close {
+            background: rgba(102, 126, 234, 0.2);
+        }
+
+        .execution-details {
+            flex: 1;
+        }
+
+        .execution-strategy {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .execution-description {
+            font-size: 14px;
+            color: #9ca3af;
+        }
+
+        .execution-result {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .execution-time {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        /* Strategy Controls */
+        .strategy-controls {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .control-btn {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #374151;
+            background: rgba(55, 65, 81, 0.3);
+            color: #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .control-btn:hover {
+            background: rgba(102, 126, 234, 0.2);
+            border-color: #667eea;
+            transform: translateY(-1px);
+        }
+
+        .control-btn.pause {
+            background: rgba(245, 158, 11, 0.2);
+            border-color: rgba(245, 158, 11, 0.3);
+        }
+
+        .control-btn.activate {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        /* Notification System */
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+
+        .notification-container > * {
+            pointer-events: auto;
+        }
+
+        .notification {
+            background: #1a1d2e;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 12px;
+            padding: 16px 20px;
+            min-width: 300px;
+            max-width: 400px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            animation: slideIn 0.3s ease-out;
+            position: relative;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .notification.success {
+            border-color: rgba(16, 185, 129, 0.5);
+            background-image: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.2) 100%);
+        }
+
+        .notification.warning {
+            border-color: rgba(245, 158, 11, 0.5);
+            background-image: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.2) 100%);
+        }
+
+        .notification.info {
+            border-color: rgba(59, 130, 246, 0.5);
+            background-image: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.2) 100%);
+        }
+
+        .notification-icon {
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+            font-size: 15px;
+        }
+
+        .notification-message {
+            font-size: 13px;
+            color: #94a3b8;
+            line-height: 1.5;
+        }
+
+        .notification-close {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: none;
+            border: none;
+            color: #64748b;
+            cursor: pointer;
+            font-size: 18px;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .notification-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e2e8f0;
+        }
+
+        /* Custom Confirm Dialog */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .confirm-dialog {
+            background: #1a1d2e;
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 400px;
+            width: 90%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .confirm-dialog h3 {
+            margin-bottom: 16px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .confirm-dialog p {
+            color: #94a3b8;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .confirm-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .confirm-btn {
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+        }
+
+        .confirm-btn.cancel {
+            background: rgba(107, 114, 128, 0.2);
+            color: #e2e8f0;
+            border: 1px solid rgba(107, 114, 128, 0.3);
+        }
+
+        .confirm-btn.confirm {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .confirm-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Settings Modal Styles */
+        .modal-content {
+            background: #1a1d2e;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 700px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #e5e7eb;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: #9ca3af;
+            font-size: 28px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e5e7eb;
+        }
+
+        .settings-container {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .settings-section {
+            background: rgba(55, 65, 81, 0.3);
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .setting-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .setting-item label {
+            font-size: 13px;
+            color: #9ca3af;
+            font-weight: 500;
+        }
+
+        .setting-input {
+            background: rgba(31, 41, 55, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #e5e7eb;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .setting-input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: rgba(31, 41, 55, 0.8);
+        }
+
+        .setting-input:hover {
+            border-color: rgba(102, 126, 234, 0.5);
+        }
+
+        /* Toggle Switch */
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 24px;
+            background: rgba(107, 114, 128, 0.3);
+            border-radius: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #9ca3af;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s ease;
+        }
+
+        input[type="checkbox"]:checked + .toggle-switch {
+            background: rgba(16, 185, 129, 0.3);
+        }
+
+        input[type="checkbox"]:checked + .toggle-switch::after {
+            left: 26px;
+            background: #10b981;
+        }
+
+        input[type="checkbox"] {
+            display: none;
+        }
+
+        /* Modal Buttons */
+        .modal-btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .modal-btn-confirm {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .modal-btn-cancel {
+            background: rgba(107, 114, 128, 0.2);
+            color: #e5e7eb;
+            border: 1px solid rgba(107, 114, 128, 0.3);
+        }
+
+        .modal-btn-secondary {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .strategy-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 16px;
+                align-items: flex-start;
+            }
+
+            .strategy-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .settings-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Updated Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="logo">My Trading Pal 🤖</div>
+        
+        <div class="nav-section">
+            <div class="nav-section-title">Main</div>
+            <a href="dashboard.html" class="nav-item">
+                <span class="nav-icon">📊</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="trades.html" class="nav-item">
+                <span class="nav-icon">💹</span>
+                <span>Trade Management</span>
+            </a>
+            <a href="accounts.html" class="nav-item">
+                <span class="nav-icon">💼</span>
+                <span>Accounts</span>
+            </a>
+            <a href="#" class="nav-item active">
+                <span class="nav-icon">📈</span>
+                <span>Strategies</span>
+            </a>
+        </div>
+        
+        <div class="nav-section">
+            <div class="nav-section-title">AI System</div>
+            <a href="ai-status.html" class="nav-item">
+                <span class="nav-icon">🤖</span>
+                <span>AI Status</span>
+            </a>
+            <a href="performance.html" class="nav-item">
+                <span class="nav-icon">📊</span>
+                <span>Performance</span>
+            </a>
+            <a href="risk.html" class="nav-item">
+                <span class="nav-icon">🛡️</span>
+                <span>Risk Monitor</span>
+            </a>
+        </div>
+        
+        <div class="nav-section">
+            <div class="nav-section-title">Analytics</div>
+            <a href="reports.html" class="nav-item">
+                <span class="nav-icon">📑</span>
+                <span>Reports</span>
+            </a>
+            <a href="logs.html" class="nav-item">
+                <span class="nav-icon">🔔</span>
+                <span>System Logs</span>
+            </a>
+        </div>
+        
+        <div class="nav-section">
+            <div class="nav-section-title">Settings</div>
+            <a href="settings.html" class="nav-item">
+                <span class="nav-icon">⚙️</span>
+                <span>Settings</span>
+            </a>
+        </div>
+        
+        <div style="padding: 24px; margin-top: auto; border-top: 1px solid #2a3441;">
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #6b7280;">
+                <span style="color: #10b981;">●</span>
+                <span>All Systems Operational</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu Toggle -->
+    <button class="menu-toggle" id="menuToggle">☰</button>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <h1>📈 Strategy Management</h1>
+            <div style="display: flex; gap: 12px;">
+                <button class="btn btn-success" onclick="activateAllStrategies()">
+                    ⚡ Activate All
+                </button>
+                <button class="btn btn-warning" onclick="pauseAllStrategies()">
+                    ⏸️ Pause All
+                </button>
+            </div>
+        </div>
+
+        <!-- Strategy Cards -->
+        <div class="strategy-grid">
+            <!-- Morning Strategy -->
+            <div class="strategy-card morning" data-strategy="morning">
+                <div class="strategy-header">
+                    <div class="strategy-title">
+                        🌅 Morning Strategy
+                    </div>
+                    <div class="strategy-status status-monitoring">MONITORING</div>
+                </div>
+
+                <div class="strategy-stats">
+                    <div class="stat-item">
+                        <div class="stat-value positive">61.58%</div>
+                        <div class="stat-label">Win Rate</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">2/3</div>
+                        <div class="stat-label">Today</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value positive">+$520</div>
+                        <div class="stat-label">Daily P&L</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">3M</div>
+                        <div class="stat-label">Timeframe</div>
+                    </div>
+                </div>
+
+                <div class="strategy-description morning">
+                    <strong>📋 Strategy Details:</strong><br>
+                    • <strong>Session:</strong> 11:00am - 2:00pm UK time<br>
+                    • <strong>Logic:</strong> Range breakout on 3M timeframe<br>
+                    • <strong>Entry:</strong> Breakout + No pullback requirement (optimized!)<br>
+                    • <strong>Target:</strong> 30 points (1.5:1 R:R)<br>
+                    • <strong>Stop Loss:</strong> 20 points below/above range<br>
+                    • <strong>Filters:</strong> EMA trend alignment + volume confirmation
+                </div>
+
+                <div class="trade-opportunities">
+                    <div class="opportunities-title">📊 Current Opportunities</div>
+                    <div class="trade-opportunity">
+                        <div>
+                            <div>Active range: 15,250 - 15,275</div>
+                            <div class="trade-time">Monitoring for breakout</div>
+                        </div>
+                        <div class="trade-status status-ready">READY</div>
+                    </div>
+                    <div class="trade-opportunity">
+                        <div>
+                            <div>Next session: Tomorrow 11:00am UK</div>
+                            <div class="trade-time">Range will be set at market open</div>
+                        </div>
+                        <div class="trade-status status-pending">PENDING</div>
+                    </div>
+                    <div class="trade-opportunity">
+                        <div>
+                            <div>Market conditions: Bullish trend</div>
+                            <div class="trade-time">EMA alignment favorable</div>
+                        </div>
+                        <div class="trade-status status-ready">READY</div>
+                    </div>
+                </div>
+
+                <div class="strategy-controls">
+                    <button class="control-btn pause" data-action="toggle" data-strategy="morning">⏸️ Pause Strategy</button>
+                    <button class="control-btn" data-action="details" data-strategy="morning">📊 Details</button>
+                    <button class="control-btn" data-action="configure" data-strategy="morning">⚙️ Configure</button>
+                </div>
+            </div>
+
+            <!-- NY Open Strategy -->
+            <div class="strategy-card nyopen" data-strategy="nyopen">
+                <div class="strategy-header">
+                    <div class="strategy-title">
+                        🚀 NY Open Strategy
+                    </div>
+                    <div class="strategy-status status-waiting">WAITING</div>
+                </div>
+
+                <div class="strategy-stats">
+                    <div class="stat-item">
+                        <div class="stat-value positive">56.25%</div>
+                        <div class="stat-label">Win Rate</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">1/2</div>
+                        <div class="stat-label">Today</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">$0</div>
+                        <div class="stat-label">Daily P&L</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">3M</div>
+                        <div class="stat-label">Timeframe</div>
+                    </div>
+                </div>
+
+                <div class="strategy-description nyopen">
+                    <strong>📋 Strategy Details:</strong><br>
+                    • <strong>Session:</strong> 2:30pm - 4:00pm UK time (NY Open)<br>
+                    • <strong>Logic:</strong> Breakout + MACD confirmation + pullback<br>
+                    • <strong>Target:</strong> Multi-level TPs (2:1, 3:1, 5:1 R:R)<br>
+                    • <strong>Stop Loss:</strong> ATR-based (1.5x ATR)<br>
+                    • <strong>Filters:</strong> EMA trend + MACD direction (key optimization!)<br>
+                    • <strong>Special:</strong> Requires 13 EMA pullback for entry
+                </div>
+
+                <div class="trade-opportunities">
+                    <div class="opportunities-title">📊 Current Opportunities</div>
+                    <div class="trade-opportunity">
+                        <div>
+                            <div>Waiting for NY session open</div>
+                            <div class="trade-time">Opens at 2:30pm UK</div>
+                        </div>
+                        <div class="trade-status status-pending">PENDING</div>
+                    </div>
+                    <div class="trade-opportunity">
+                        <div>
+                            <div>Pre-market analysis complete</div>
+                            <div class="trade-time">Bullish bias detected</div>
+                        </div>
+                        <div class="trade-status status-ready">READY</div>
+                    </div>
+                </div>
+
+                <div class="strategy-controls">
+                    <button class="control-btn pause" data-action="toggle" data-strategy="nyopen">⏸️ Pause Strategy</button>
+                    <button class="control-btn" data-action="details" data-strategy="nyopen">📊 Details</button>
+                    <button class="control-btn" data-action="configure" data-strategy="nyopen">⚙️ Configure</button>
+                </div>
+            </div>
+
+            <!-- US ORB Strategy -->
+            <div class="strategy-card usorb" data-strategy="usorb">
+                <div class="strategy-header">
+                    <div class="strategy-title">
+                        ⭐ US ORB Strategy
+                    </div>
+                    <div class="strategy-status status-monitoring">MONITORING</div>
+                </div>
+
+                <div class="strategy-stats">
+                    <div class="stat-item">
+                        <div class="stat-value positive">70.83%</div>
+                        <div class="stat-label">Win Rate</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">3/3</div>
+                        <div class="stat-label">Today</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value positive">+$840</div>
+                        <div class="stat-label">Daily P&L</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">5M</div>
+                        <div class="stat-label">Timeframe</div>
+                    </div>
+                </div>
+
+                <div class="strategy-description usorb">
+                    <strong>📋 Strategy Details:</strong><br>
+                    • <strong>Session:</strong> 2:30pm - 10:30pm UK time<br>
+                    • <strong>Logic:</strong> Opening Range Breakout (15-min range)<br>
+                    • <strong>Entry:</strong> Breakout with volume surge<br>
+                    • <strong>Target:</strong> 50 points (2.5:1 R:R)<br>
+                    • <strong>Stop Loss:</strong> 20 points or opposite range boundary<br>
+                    • <strong>Filters:</strong> Volume > 1.5x average + momentum confirmation<br>
+                    • <strong>Best performer:</strong> 70.83% win rate! 🎯
+                </div>
+
+                <div class="trade-opportunities">
+                    <div class="opportunities-title">📊 Current Opportunities</div>
+                    <div class="trade-opportunity">
+                        <div>
+                            <div>ORB High: 15,315 | Low: 15,280</div>
+                            <div class="trade-time">Monitoring both levels</div>
+                        </div>
+                        <div class="trade-status status-ready">READY</div>
+                    </div>
+                    <div class="trade-opportunity">
+                        <div>
+                            <div>Volume surge detected</div>
+                            <div class="trade-time">157% above average</div>
+                        </div>
+                        <div class="trade-status status-ready">READY</div>
+                    </div>
+                </div>
+
+                <div class="strategy-controls">
+                    <button class="control-btn pause" data-action="toggle" data-strategy="usorb">⏸️ Pause Strategy</button>
+                    <button class="control-btn" data-action="details" data-strategy="usorb">📊 Details</button>
+                    <button class="control-btn" data-action="configure" data-strategy="usorb">⚙️ Configure</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Executions -->
+        <div class="card">
+            <div class="section-title">⚡ Recent Strategy Executions</div>
+            <div class="execution-list">
+                <div class="execution-item">
+                    <div class="execution-icon buy">📈</div>
+                    <div class="execution-details">
+                        <div class="execution-strategy">US ORB - LONG Entry</div>
+                        <div class="execution-description">Breakout above 15,315 with volume • TopStep account</div>
+                    </div>
+                    <div>
+                        <div class="execution-result positive">+$420</div>
+                        <div class="execution-time">16:45</div>
+                    </div>
+                </div>
+
+                <div class="execution-item">
+                    <div class="execution-icon sell">📉</div>
+                    <div class="execution-details">
+                        <div class="execution-strategy">NY Open - SHORT Entry</div>
+                        <div class="execution-description">MACD divergence + pullback • Personal account</div>
+                    </div>
+                    <div>
+                        <div class="execution-result negative">-$180</div>
+                        <div class="execution-time">15:32</div>
+                    </div>
+                </div>
+
+                <div class="execution-item">
+                    <div class="execution-icon close">📊</div>
+                    <div class="execution-details">
+                        <div class="execution-strategy">US ORB - Target 1 Hit</div>
+                        <div class="execution-description">First target reached • Partial close 50%</div>
+                    </div>
+                    <div>
+                        <div class="execution-result positive">+$380</div>
+                        <div class="execution-time">15:28</div>
+                    </div>
+                </div>
+
+                <div class="execution-item">
+                    <div class="execution-icon buy">📈</div>
+                    <div class="execution-details">
+                        <div class="execution-strategy">US ORB - LONG Entry</div>
+                        <div class="execution-description">Opening range break • FTMO account</div>
+                    </div>
+                    <div>
+                        <div class="execution-result positive">+$40</div>
+                        <div class="execution-time">15:23</div>
+                    </div>
+                </div>
+
+                <div class="execution-item">
+                    <div class="execution-icon close">📊</div>
+                    <div class="execution-details">
+                        <div class="execution-strategy">Morning Strategy - Target Hit</div>
+                        <div class="execution-description">30pt target reached • FTMO account</div>
+                    </div>
+                    <div>
+                        <div class="execution-result positive">+$600</div>
+                        <div class="execution-time">11:47</div>
+                    </div>
+                </div>
+
+                <div class="execution-item">
+                    <div class="execution-icon buy">📈</div>
+                    <div class="execution-details">
+                        <div class="execution-strategy">Morning Strategy - LONG Entry</div>
+                        <div class="execution-description">Range breakout above 15,275 • EMA trend confirmed</div>
+                    </div>
+                    <div>
+                        <div class="execution-result positive">+$520</div>
+                        <div class="execution-time">11:15</div>
+                    </div>
+                </div>
+
+                <div class="execution-item">
+                    <div class="execution-icon close">📊</div>
+                    <div class="execution-details">
+                        <div class="execution-strategy">System Alert</div>
+                        <div class="execution-description">All strategies monitoring • Market data connected</div>
+                    </div>
+                    <div>
+                        <div class="execution-result">✅</div>
+                        <div class="execution-time">09:00</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Strategy Performance Comparison -->
+        <div class="card">
+            <div class="section-title">📊 Strategy Performance Comparison</div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                <div style="padding: 20px; background: rgba(55, 65, 81, 0.3); border-radius: 12px; border-left: 4px solid #f59e0b;">
+                    <h3 style="color: #f59e0b; margin-bottom: 12px;">🌅 Morning Strategy</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 14px;">
+                        <div>Win Rate: <strong>61.58%</strong></div>
+                        <div>Profit Factor: <strong>2.1</strong></div>
+                        <div>Avg Trade: <strong>+$260</strong></div>
+                        <div>Max DD: <strong>-$180</strong></div>
+                        <div>Total Trades: <strong>47</strong></div>
+                        <div>Best Month: <strong>+$3,240</strong></div>
+                    </div>
+                </div>
+
+                <div style="padding: 20px; background: rgba(55, 65, 81, 0.3); border-radius: 12px; border-left: 4px solid #3b82f6;">
+                    <h3 style="color: #3b82f6; margin-bottom: 12px;">🚀 NY Open Strategy</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 14px;">
+                        <div>Win Rate: <strong>56.25%</strong></div>
+                        <div>Profit Factor: <strong>1.8</strong></div>
+                        <div>Avg Trade: <strong>+$195</strong></div>
+                        <div>Max DD: <strong>-$240</strong></div>
+                        <div>Total Trades: <strong>32</strong></div>
+                        <div>Best Month: <strong>+$2,180</strong></div>
+                    </div>
+                </div>
+
+                <div style="padding: 20px; background: rgba(55, 65, 81, 0.3); border-radius: 12px; border-left: 4px solid #10b981;">
+                    <h3 style="color: #10b981; margin-bottom: 12px;">⭐ US ORB Strategy</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 14px;">
+                        <div>Win Rate: <strong>70.83%</strong></div>
+                        <div>Profit Factor: <strong>2.8</strong></div>
+                        <div>Avg Trade: <strong>+$280</strong></div>
+                        <div>Max DD: <strong>-$120</strong></div>
+                        <div>Total Trades: <strong>24</strong></div>
+                        <div>Best Month: <strong>+$4,200</strong></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div class="notification-container" id="notificationContainer"></div>
+
+    <!-- Confirm Modal -->
+    <div class="modal" id="confirmModal">
+        <div class="confirm-dialog">
+            <h3 id="confirmTitle"></h3>
+            <div id="confirmMessage"></div>
+            <div class="confirm-actions">
+                <button class="confirm-btn cancel" onclick="cancelConfirm()">Cancel</button>
+                <button class="confirm-btn confirm" onclick="confirmAction()">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Strategy Settings Modal -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="settingsTitle">⚙️ Strategy Configuration</h3>
+                <button class="close-btn" onclick="closeSettingsModal()">&times;</button>
+            </div>
+            
+            <div class="settings-container">
+                <!-- General Settings -->
+                <div class="settings-section">
+                    <h4 style="margin-bottom: 20px; color: #e5e7eb;">📊 General Settings</h4>
+                    <div class="settings-grid">
+                        <div class="setting-item">
+                            <label>Timeframe</label>
+                            <select id="timeframe" class="setting-input">
+                                <option value="1M">1 Minute</option>
+                                <option value="3M" selected>3 Minutes</option>
+                                <option value="5M">5 Minutes</option>
+                                <option value="15M">15 Minutes</option>
+                                <option value="30M">30 Minutes</option>
+                            </select>
+                        </div>
+                        
+                        <div class="setting-item">
+                            <label>Max Daily Trades</label>
+                            <input type="number" id="maxTrades" class="setting-input" value="3" min="1" max="10">
+                        </div>
+                        
+                        <div class="setting-item">
+                            <label>Risk Per Trade (%)</label>
+                            <input type="number" id="riskPerTrade" class="setting-input" value="1.5" min="0.5" max="5" step="0.1">
+                        </div>
+                        
+                        <div class="setting-item">
+                            <label>Position Size (Contracts)</label>
+                            <input type="number" id="positionSize" class="setting-input" value="2" min="1" max="10">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Entry Rules -->
+                <div class="settings-section">
+                    <h4 style="margin-bottom: 20px; color: #e5e7eb;">🎯 Entry Rules</h4>
+                    <div class="settings-grid">
+                        <div class="setting-item">
+                            <label>Stop Loss (Points)</label>
+                            <input type="number" id="stopLoss" class="setting-input" value="20" min="10" max="50">
+                        </div>
+                        
+                        <div class="setting-item">
+                            <label>Take Profit (Points)</label>
+                            <input type="number" id="takeProfit" class="setting-input" value="30" min="20" max="100">
+                        </div>
+                        
+                        <div class="setting-item">
+                            <label>Breakout Confirmation</label>
+                            <select id="breakoutConfirm" class="setting-input">
+                                <option value="immediate">Immediate</option>
+                                <option value="1candle">1 Candle Close</option>
+                                <option value="2candles" selected>2 Candle Closes</option>
+                                <option value="3candles">3 Candle Closes</option>
+                            </select>
+                        </div>
+                        
+                        <div class="setting-item">
+                            <label>Volume Filter</label>
+                            <div class="toggle-container">
+                                <input type="checkbox" id="volumeFilter" checked>
+                                <label for="volumeFilter" class="toggle-switch"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Technical Indicators -->
+                <div class="settings-section">
+                    <h4 style="margin-bottom: 20px; color: #e5e7eb;">📈 Technical Indicators</h4>
+                    <div class="settings-grid">
+                        <div class="setting-item">
+                            <label>EMA Period 1</label>
+                            <input type="number" id="ema1" class="setting-input" value="20" min="5" max="50">
+                        </div>
+                        
+                        <div class="setting-item">
+                            <label>EMA Period 2</label>
+                            <input type="number" id="ema2" class="setting-input" value="50" min="20" max="200">
+                        </div>
+                        
+                        <div class="setting-item">
+                            <label>Volume Threshold (%)</label>
+                            <input type="number" id="volumeThreshold" class="setting-input" value="150" min="100" max="300" step="10">
+                        </div>
+                        
+                        <div class="setting-item">
+                            <label>ATR Period</label>
+                            <input type="number" id="atrPeriod" class="setting-input" value="14" min="7" max="30">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Strategy Specific Settings -->
+                <div class="settings-section" id="strategySpecificSettings">
+                    <!-- Will be populated based on strategy -->
+                </div>
+            </div>
+            
+            <div class="modal-actions" style="margin-top: 32px; display: flex; gap: 12px; justify-content: flex-end;">
+                <button class="modal-btn modal-btn-secondary" onclick="resetToDefaults()">🔄 Reset to Defaults</button>
+                <button class="modal-btn modal-btn-cancel" onclick="closeSettingsModal()">Cancel</button>
+                <button class="modal-btn modal-btn-confirm" onclick="saveSettings()">💾 Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentConfirmCallback = null;
+        let currentStrategy = null;
+
+        // Notification System
+        function showNotification(title, message, type = 'success') {
+            const container = document.getElementById('notificationContainer');
+            
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            
+            const iconMap = {
+                success: '✅',
+                warning: '⚠️',
+                info: 'ℹ️'
+            };
+            
+            notification.innerHTML = `
+                <div class="notification-icon">${iconMap[type]}</div>
+                <div class="notification-content">
+                    <div class="notification-title">${title}</div>
+                    <div class="notification-message">${message}</div>
+                </div>
+                <button class="notification-close" onclick="this.parentElement.remove()">×</button>
+            `;
+            
+            container.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => notification.remove(), 300);
+            }, 5000);
+        }
+
+        // Confirm Dialog System
+        function showConfirm(title, message, callback) {
+            const modal = document.getElementById('confirmModal');
+            document.getElementById('confirmTitle').innerHTML = title;
+            document.getElementById('confirmMessage').innerHTML = message;
+            modal.classList.add('show');
+            currentConfirmCallback = callback;
+        }
+
+        function confirmAction() {
+            const modal = document.getElementById('confirmModal');
+            modal.classList.remove('show');
+            if (currentConfirmCallback) {
+                currentConfirmCallback(true);
+                currentConfirmCallback = null;
+            }
+        }
+
+        function cancelConfirm() {
+            const modal = document.getElementById('confirmModal');
+            modal.classList.remove('show');
+            if (currentConfirmCallback) {
+                currentConfirmCallback(false);
+                currentConfirmCallback = null;
+            }
+        }
+
+        // Strategy Names
+        const strategyNames = {
+            morning: 'Morning Strategy',
+            nyopen: 'NY Open Strategy',
+            usorb: 'US ORB Strategy'
+        };
+
+        // Toggle Strategy (Pause/Activate)
+        function toggleStrategy(strategy) {
+            const strategyCard = document.querySelector(`.strategy-card[data-strategy="${strategy}"]`);
+            const statusBadge = strategyCard.querySelector('.strategy-status');
+            const toggleBtn = strategyCard.querySelector('[data-action="toggle"]');
+            const isPaused = strategyCard.classList.contains('paused');
+
+            if (isPaused) {
+                // Activate the strategy
+                showNotification(
+                    `▶️ ${strategyNames[strategy]} ACTIVATED`,
+                    `✅ Strategy monitoring resumed<br>
+                    ✅ Automatic trading enabled<br>
+                    ✅ Market scanning active<br>
+                    ✅ Risk protocols engaged<br><br>
+                    📈 Strategy is now actively trading!`,
+                    'success'
+                );
+                
+                toggleBtn.textContent = '⏸️ Pause Strategy';
+                toggleBtn.classList.remove('activate');
+                toggleBtn.classList.add('pause');
+                
+                statusBadge.textContent = 'MONITORING';
+                statusBadge.className = 'strategy-status status-monitoring';
+                
+                strategyCard.classList.remove('paused');
+            } else {
+                // Pause the strategy
+                showConfirm(
+                    `⏸️ Pause ${strategyNames[strategy]}?`,
+                    `This will:<br>
+                    ❌ Stop monitoring for new signals<br>
+                    ❌ Disable automatic trading<br>
+                    ✅ Keep existing positions open<br>
+                    ✅ Maintain stop losses and targets<br><br>
+                    Strategy can be reactivated anytime. Continue?`,
+                    function(confirmed) {
+                        if (confirmed) {
+                            toggleBtn.textContent = '▶️ Activate Strategy';
+                            toggleBtn.classList.remove('pause');
+                            toggleBtn.classList.add('activate');
+                            
+                            statusBadge.textContent = 'PAUSED';
+                            statusBadge.className = 'strategy-status status-paused';
+                            
+                            strategyCard.classList.add('paused');
+                            
+                            showNotification(
+                                `⏸️ ${strategyNames[strategy]} PAUSED`,
+                                `❌ Strategy monitoring stopped<br>
+                                ❌ New trade execution disabled<br>
+                                ✅ Existing positions protected<br>
+                                ✅ Ready for quick reactivation<br><br>
+                                ▶️ Use 'Activate' to resume operations`,
+                                'warning'
+                            );
+                        }
+                    }
+                );
+            }
+        }
+
+        // View Strategy Details
+        function viewStrategyDetails(strategy) {
+            const details = {
+                morning: {
+                    performance: '📊 Win Rate: 61.58%\n💰 Profit Factor: 2.1\n📈 Total Trades: 47\n🎯 Avg Win: +$260',
+                    recent: '🏆 Today: 2/3 wins (+$520)\n📅 This Week: 7/11 wins (+$1,820)\n📆 This Month: 29/47 wins (+$12,220)',
+                    optimization: '✨ Recent Optimization: Removed pullback requirement\n📊 Improvement: +5.2% win rate increase\n🎯 Next Focus: Volume filter refinement'
+                },
+                nyopen: {
+                    performance: '📊 Win Rate: 56.25%\n💰 Profit Factor: 1.8\n📈 Total Trades: 32\n🎯 Avg Win: +$195',
+                    recent: '🏆 Today: 1/2 wins (+$0)\n📅 This Week: 5/8 wins (+$980)\n📆 This Month: 18/32 wins (+$6,240)',
+                    optimization: '✨ Recent Optimization: Added MACD confirmation\n📊 Improvement: +3.1% win rate increase\n🎯 Next Focus: Multi-timeframe analysis'
+                },
+                usorb: {
+                    performance: '📊 Win Rate: 70.83%\n💰 Profit Factor: 2.8\n📈 Total Trades: 24\n🎯 Avg Win: +$280',
+                    recent: '🏆 Today: 3/3 wins (+$840)\n📅 This Week: 8/10 wins (+$2,240)\n📆 This Month: 17/24 wins (+$6,720)',
+                    optimization: '✨ Best Performing Strategy!\n📊 Consistently profitable\n🎯 Consider increasing position size'
+                }
+            };
+
+            const data = details[strategy];
+            
+            showNotification(
+                `📊 ${strategyNames[strategy]} Analytics`,
+                `<strong>Performance Metrics:</strong><br>${data.performance.replace(/\n/g, '<br>')}<br><br>
+                <strong>Recent Trading:</strong><br>${data.recent.replace(/\n/g, '<br>')}<br><br>
+                <strong>Optimization Notes:</strong><br>${data.optimization.replace(/\n/g, '<br>')}`,
+                'info'
+            );
+        }
+
+        // Configure Strategy
+        function configureStrategy(strategy) {
+            const strategyData = {
+                morning: {
+                    title: '🌅 Morning Strategy Configuration',
+                    specific: {
+                        'Range Start': { type: 'time', value: '11:00', id: 'rangeStart' },
+                        'Range End': { type: 'time', value: '11:30', id: 'rangeEnd' },
+                        'Session End': { type: 'time', value: '14:00', id: 'sessionEnd' },
+                        'Pullback Required': { type: 'checkbox', value: false, id: 'pullbackRequired' },
+                        'EMA Filter': { type: 'checkbox', value: true, id: 'emaFilter' },
+                        'Range Min Size': { type: 'number', value: '15', id: 'rangeMinSize' }
+                    }
+                },
+                nyopen: {
+                    title: '🚀 NY Open Strategy Configuration',
+                    specific: {
+                        'Session Start': { type: 'time', value: '14:30', id: 'sessionStart' },
+                        'Session End': { type: 'time', value: '16:00', id: 'sessionEnd' },
+                        'MACD Filter': { type: 'checkbox', value: true, id: 'macdFilter' },
+                        'Pullback to EMA': { type: 'number', value: '13', id: 'pullbackEMA' },
+                        'Multi TP Levels': { type: 'text', value: '2:1, 3:1, 5:1', id: 'tpLevels' },
+                        'ATR Multiplier': { type: 'number', value: '1.5', id: 'atrMultiplier' }
+                    }
+                },
+                usorb: {
+                    title: '⭐ US ORB Strategy Configuration',
+                    specific: {
+                        'ORB Duration': { type: 'number', value: '15', id: 'orbDuration' },
+                        'Start Time': { type: 'time', value: '14:30', id: 'orbStart' },
+                        'End Time': { type: 'time', value: '22:30', id: 'orbEnd' },
+                        'Volume Surge %': { type: 'number', value: '150', id: 'volumeSurge' },
+                        'Breakout Bars': { type: 'number', value: '2', id: 'breakoutBars' },
+                        'Use ATR Stop': { type: 'checkbox', value: false, id: 'useAtrStop' }
+                    }
+                }
+            };
+
+            const data = strategyData[strategy];
+            const modal = document.getElementById('settingsModal');
+            document.getElementById('settingsTitle').textContent = data.title;
+            
+            // Set default values based on strategy
+            document.getElementById('timeframe').value = strategy === 'morning' ? '30M' : '3M';
+            document.getElementById('stopLoss').value = strategy === 'usorb' ? '20' : '20';
+            document.getElementById('takeProfit').value = strategy === 'morning' ? '30' : strategy === 'usorb' ? '50' : '40';
+            
+            // Build strategy-specific settings
+            const specificContainer = document.getElementById('strategySpecificSettings');
+            specificContainer.innerHTML = `
+                <h4 style="margin-bottom: 20px; color: #e5e7eb;">🎯 ${strategyNames[strategy]} Specific</h4>
+                <div class="settings-grid">
+            `;
+            
+            for (const [label, config] of Object.entries(data.specific)) {
+                if (config.type === 'checkbox') {
+                    specificContainer.innerHTML += `
+                        <div class="setting-item">
+                            <label>${label}</label>
+                            <div class="toggle-container">
+                                <input type="checkbox" id="${config.id}" ${config.value ? 'checked' : ''}>
+                                <label for="${config.id}" class="toggle-switch"></label>
+                            </div>
+                        </div>
+                    `;
+                } else if (config.type === 'number') {
+                    specificContainer.innerHTML += `
+                        <div class="setting-item">
+                            <label>${label}</label>
+                            <input type="${config.type}" id="${config.id}" class="setting-input" value="${config.value}" min="0" max="200" step="1">
+                        </div>
+                    `;
+                } else {
+                    specificContainer.innerHTML += `
+                        <div class="setting-item">
+                            <label>${label}</label>
+                            <input type="${config.type}" id="${config.id}" class="setting-input" value="${config.value}">
+                        </div>
+                    `;
+                }
+            }
+            
+            specificContainer.innerHTML += '</div>';
+            
+            // Store current strategy for saving
+            window.currentStrategy = strategy;
+            
+            // Show modal
+            modal.classList.add('show');
+        }
+
+        // Close Settings Modal
+        function closeSettingsModal() {
+            document.getElementById('settingsModal').classList.remove('show');
+            window.currentStrategy = null;
+        }
+
+        // Save Settings
+        function saveSettings() {
+            const strategy = window.currentStrategy;
+            
+            // Collect all settings
+            const settings = {
+                general: {
+                    timeframe: document.getElementById('timeframe').value,
+                    maxTrades: document.getElementById('maxTrades').value,
+                    riskPerTrade: document.getElementById('riskPerTrade').value,
+                    positionSize: document.getElementById('positionSize').value
+                },
+                entry: {
+                    stopLoss: document.getElementById('stopLoss').value,
+                    takeProfit: document.getElementById('takeProfit').value,
+                    breakoutConfirm: document.getElementById('breakoutConfirm').value,
+                    volumeFilter: document.getElementById('volumeFilter').checked
+                },
+                technical: {
+                    ema1: document.getElementById('ema1').value,
+                    ema2: document.getElementById('ema2').value,
+                    volumeThreshold: document.getElementById('volumeThreshold').value,
+                    atrPeriod: document.getElementById('atrPeriod').value
+                }
+            };
+            
+            showNotification(
+                `💾 ${strategyNames[strategy]} Settings Saved`,
+                `✅ Configuration updated successfully!<br><br>
+                📊 Timeframe: ${settings.general.timeframe}<br>
+                🎯 Stop Loss: ${settings.entry.stopLoss} points<br>
+                💰 Take Profit: ${settings.entry.takeProfit} points<br>
+                📈 Risk per Trade: ${settings.general.riskPerTrade}%<br><br>
+                🧠 Strategy is adapting to new parameters...<br>
+                ⚡ Changes are now active!`,
+                'success'
+            );
+            
+            closeSettingsModal();
+        }
+
+        // Reset to Defaults
+        function resetToDefaults() {
+            showConfirm(
+                '🔄 Reset to Default Settings?',
+                `This will reset all parameters to their default values:<br><br>
+                • Stop Loss: 20 points<br>
+                • Take Profit: 30 points<br>
+                • Risk per Trade: 1.5%<br>
+                • All indicators to standard settings<br><br>
+                Are you sure you want to continue?`,
+                function(confirmed) {
+                    if (confirmed) {
+                        // Reset form values
+                        document.getElementById('timeframe').value = '3M';
+                        document.getElementById('maxTrades').value = '3';
+                        document.getElementById('riskPerTrade').value = '1.5';
+                        document.getElementById('positionSize').value = '2';
+                        document.getElementById('stopLoss').value = '20';
+                        document.getElementById('takeProfit').value = '30';
+                        document.getElementById('breakoutConfirm').value = '2candles';
+                        document.getElementById('volumeFilter').checked = true;
+                        document.getElementById('ema1').value = '20';
+                        document.getElementById('ema2').value = '50';
+                        document.getElementById('volumeThreshold').value = '150';
+                        document.getElementById('atrPeriod').value = '14';
+                        
+                        showNotification(
+                            '🔄 Settings Reset',
+                            'All parameters have been reset to default values',
+                            'info'
+                        );
+                    }
+                }
+            );
+        }
+
+        // Activate All Strategies
+        function activateAllStrategies() {
+            showNotification(
+                '⚡ ALL STRATEGIES ACTIVATED',
+                `🌅 Morning Strategy: MONITORING<br>
+                🚀 NY Open Strategy: MONITORING<br>
+                ⭐ US ORB Strategy: MONITORING<br><br>
+                🤖 Full trading system operational<br>
+                📊 All strategies actively scanning<br>
+                🛡️ Risk management protocols active<br>
+                📈 Real-time execution enabled<br><br>
+                🚀 YOUR TRADING SYSTEM IS LIVE!`,
+                'success'
+            );
+            
+            // Update all strategy statuses
+            document.querySelectorAll('.strategy-status').forEach(status => {
+                status.textContent = 'MONITORING';
+                status.className = 'strategy-status status-monitoring';
+            });
+            
+            // Update all toggle buttons
+            document.querySelectorAll('[data-action="toggle"]').forEach(btn => {
+                btn.textContent = '⏸️ Pause Strategy';
+                btn.classList.remove('activate');
+                btn.classList.add('pause');
+            });
+            
+            // Remove paused state from all cards
+            document.querySelectorAll('.strategy-card').forEach(card => {
+                card.classList.remove('paused');
+            });
+        }
+
+        // Pause All Strategies
+        function pauseAllStrategies() {
+            showConfirm(
+                '⏸️ PAUSE ALL STRATEGIES?',
+                `This will:<br>
+                ❌ Stop ALL strategy monitoring<br>
+                ❌ Disable ALL automatic trading<br>
+                ❌ Pause signal generation<br>
+                ✅ Keep existing positions<br>
+                ✅ Maintain system connections<br><br>
+                All strategies can be reactivated instantly. Continue?`,
+                function(confirmed) {
+                    if (confirmed) {
+                        showNotification(
+                            '⏸️ ALL STRATEGIES PAUSED',
+                            `❌ Morning Strategy: PAUSED<br>
+                            ❌ NY Open Strategy: PAUSED<br>
+                            ❌ US ORB Strategy: PAUSED<br><br>
+                            🛑 Trading system in standby mode<br>
+                            📊 Market monitoring reduced<br>
+                            ✅ Positions remain protected<br><br>
+                            ⚡ Use 'Activate All' to resume full operations`,
+                            'warning'
+                        );
+                        
+                        // Update all strategy statuses
+                        document.querySelectorAll('.strategy-status').forEach(status => {
+                            status.textContent = 'PAUSED';
+                            status.className = 'strategy-status status-paused';
+                        });
+                        
+                        // Update all toggle buttons
+                        document.querySelectorAll('[data-action="toggle"]').forEach(btn => {
+                            btn.textContent = '▶️ Activate Strategy';
+                            btn.classList.remove('pause');
+                            btn.classList.add('activate');
+                        });
+                        
+                        // Add paused state to all cards
+                        document.querySelectorAll('.strategy-card').forEach(card => {
+                            card.classList.add('paused');
+                        });
+                    }
+                }
+            );
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile menu toggle
+            const menuToggle = document.getElementById('menuToggle');
+            if (menuToggle) {
+                menuToggle.addEventListener('click', function() {
+                    const sidebar = document.getElementById('sidebar');
+                    sidebar.classList.toggle('mobile-open');
+                });
+            }
+
+            // Event delegation for all buttons
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('control-btn')) {
+                    const action = e.target.getAttribute('data-action');
+                    const strategy = e.target.getAttribute('data-strategy');
+                    
+                    if (action === 'toggle') {
+                        toggleStrategy(strategy);
+                    } else if (action === 'details') {
+                        viewStrategyDetails(strategy);
+                    } else if (action === 'configure') {
+                        configureStrategy(strategy);
+                    }
+                }
+            });
+
+            // Close modal on background click
+            document.getElementById('confirmModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    cancelConfirm();
+                }
+            });
+
+            // Close settings modal on background click
+            document.getElementById('settingsModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeSettingsModal();
+                }
+            });
+
+            // Animate strategy cards on load
+            const cards = document.querySelectorAll('.strategy-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.5s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 200);
+            });
+
+            console.log('✅ My Trading Pal - Strategies Page Loaded');
+            console.log('🚀 All interactive elements ready');
+            console.log('📊 Real-time strategy monitoring active');
+        });
+    </script>
+</body>
+</html>
