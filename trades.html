@@ -1,0 +1,1701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My TP - Trade Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0e1a;
+            color: #e0e0e0;
+            min-height: 100vh;
+            display: flex;
+        }
+
+        body.modal-open {
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(180deg, #1a1f2e 0%, #0f1419 100%);
+            border-right: 1px solid #2a3441;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 24px;
+            border-bottom: 1px solid #2a3441;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-section {
+            padding: 16px 0;
+        }
+
+        .nav-section-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 0 24px;
+            margin-bottom: 8px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 24px;
+            color: #d1d5db;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: white;
+        }
+
+        .nav-item.active {
+            background: rgba(102, 126, 234, 0.15);
+            color: #667eea;
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: #667eea;
+        }
+
+        .nav-icon {
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1a1f2e 0%, #0a0e1a 100%);
+            border-bottom: 1px solid #2a3441;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 16px;
+        }
+
+        /* Container */
+        .container {
+            flex: 1;
+            padding: 24px 32px;
+            overflow-y: auto;
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: rgba(55, 65, 81, 0.5);
+            color: white;
+            border: 1px solid #374151;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Summary Cards */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            border: 1px solid #374151;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .summary-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .summary-icon {
+            font-size: 18px;
+            margin-bottom: 6px;
+            opacity: 0.8;
+            display: inline-block;
+        }
+
+        .summary-value {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .summary-label {
+            color: #9ca3af;
+            font-size: 12px;
+        }
+
+        .positive { color: #10b981; }
+        .negative { color: #ef4444; }
+
+        /* Sections */
+        .positions-section, .history-section {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            border: 1px solid #374151;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Position Cards */
+        .position-card {
+            background: rgba(55, 65, 81, 0.3);
+            border: 1px solid #374151;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: grid;
+            grid-template-columns: auto 1fr auto auto auto auto;
+            align-items: center;
+            gap: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .position-card:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .position-side {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-weight: 600;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .side-long {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .side-short {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .position-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .position-symbol {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .position-details {
+            color: #9ca3af;
+            font-size: 12px;
+        }
+
+        .position-pnl {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .position-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            background: rgba(55, 65, 81, 0.5);
+            border: 1px solid #374151;
+            border-radius: 6px;
+            color: white;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            outline: none;
+        }
+
+        .action-btn:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .action-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            padding: 16px;
+            background: rgba(55, 65, 81, 0.3);
+            border-radius: 8px;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-label {
+            color: #9ca3af;
+            font-size: 14px;
+        }
+
+        .filter-input, .filter-select {
+            padding: 8px 12px;
+            background: rgba(55, 65, 81, 0.5);
+            border: 1px solid #374151;
+            border-radius: 6px;
+            color: white;
+            font-size: 14px;
+        }
+
+        .filter-input:focus, .filter-select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        /* Trade Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 12px;
+            color: #9ca3af;
+            font-weight: 600;
+            font-size: 14px;
+            border-bottom: 1px solid #374151;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        th:hover {
+            color: #667eea;
+        }
+
+        td {
+            padding: 16px 12px;
+            border-bottom: 1px solid rgba(55, 65, 81, 0.3);
+        }
+
+        tr:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .trade-id {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .strategy-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-morning {
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+        }
+
+        .badge-nyopen {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+        }
+
+        .badge-usorb {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .page-btn {
+            padding: 8px 12px;
+            background: rgba(55, 65, 81, 0.5);
+            border: 1px solid #374151;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .page-btn:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .page-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: transparent;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 100;
+        }
+
+        .quick-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .quick-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.5);
+        }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            background: #1f2937;
+            border: 1px solid #374151;
+            border-radius: 8px;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+            z-index: 2000;
+            max-width: 400px;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .toast-icon {
+            font-size: 16px;
+        }
+
+        .toast-message {
+            font-size: 14px;
+        }
+
+        .toast.success {
+            border-color: #10b981;
+        }
+
+        .toast.error {
+            border-color: #ef4444;
+        }
+
+        .toast.info {
+            border-color: #667eea;
+        }
+
+        /* Mobile Menu Toggle */
+        .menu-toggle {
+            display: none;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            animation: fadeIn 0.2s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .modal-content {
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from { 
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .modal input:focus,
+        .modal select:focus {
+            outline: none;
+            border-color: #667eea !important;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .modal button {
+            transition: all 0.2s ease;
+        }
+        
+        .modal button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal button:active {
+            transform: translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .position-card {
+                grid-template-columns: auto 1fr auto;
+                gap: 12px;
+            }
+            
+            .position-card > div:nth-child(3),
+            .position-card > div:nth-child(4) {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .header {
+                padding-left: 60px;
+            }
+            
+            .menu-toggle {
+                display: block;
+                position: fixed;
+                top: 20px;
+                left: 20px;
+                z-index: 1001;
+                background: rgba(55, 65, 81, 0.8);
+                border: 1px solid #374151;
+                border-radius: 8px;
+                padding: 10px;
+                cursor: pointer;
+                color: white;
+            }
+            
+            .summary-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filter-group {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                🤖 My Trading Pal
+            </div>
+        </div>
+        
+        <div class="nav-section">
+            <div class="nav-section-title">Main</div>
+            <a href="dashboard.html" class="nav-item">
+                <span class="nav-icon">📊</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="#" class="nav-item active">
+                <span class="nav-icon">💹</span>
+                <span>Trade Management</span>
+            </a>
+            <a href="accounts.html" class="nav-item">
+                <span class="nav-icon">💼</span>
+                <span>Accounts</span>
+            </a>
+            <a href="strategies.html" class="nav-item">
+                <span class="nav-icon">📈</span>
+                <span>Strategies</span>
+            </a>
+        </div>
+        
+        <div class="nav-section">
+            <div class="nav-section-title">AI System</div>
+            <a href="ai-status.html" class="nav-item">
+                <span class="nav-icon">🤖</span>
+                <span>AI Status</span>
+            </a>
+            <a href="performance.html" class="nav-item">
+                <span class="nav-icon">📊</span>
+                <span>Performance</span>
+            </a>
+            <a href="risk.html" class="nav-item">
+                <span class="nav-icon">🛡️</span>
+                <span>Risk Monitor</span>
+            </a>
+        </div>
+        
+        <div class="nav-section">
+            <div class="nav-section-title">Analytics</div>
+            <a href="reports.html" class="nav-item">
+                <span class="nav-icon">📑</span>
+                <span>Reports</span>
+            </a>
+            <a href="logs.html" class="nav-item">
+                <span class="nav-icon">🔔</span>
+                <span>System Logs</span>
+            </a>
+        </div>
+        
+        <div class="nav-section">
+            <div class="nav-section-title">Settings</div>
+            <a href="settings.html" class="nav-item">
+                <span class="nav-icon">⚙️</span>
+                <span>Settings</span>
+            </a>
+        </div>
+        
+        <div style="padding: 24px; margin-top: auto; border-top: 1px solid #2a3441;">
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #6b7280;">
+                <span style="color: #10b981; font-size: 8px;">●</span>
+                <span>All Systems Operational</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu Toggle -->
+    <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <h1 style="display: flex; align-items: center; gap: 8px;"><span style="font-size: 24px;">💰</span> Trade Management</h1>
+            <div class="header-actions">
+                <button class="btn btn-secondary" onclick="exportTrades()" style="font-size: 14px;">
+                    <span style="font-size: 16px;">📊</span> Export
+                </button>
+                <button class="btn btn-primary" onclick="refreshTrades()" style="font-size: 14px;">
+                    <span style="font-size: 16px;">🔄</span> Refresh
+                </button>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- Summary Cards -->
+            <div class="summary-cards">
+                <div class="summary-card">
+                    <div class="summary-icon">📋</div>
+                    <div class="summary-value">127</div>
+                    <div class="summary-label">Total Trades</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-icon">✅</div>
+                    <div class="summary-value positive">87</div>
+                    <div class="summary-label">Winning Trades</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-icon">❌</div>
+                    <div class="summary-value negative">40</div>
+                    <div class="summary-label">Losing Trades</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-icon">🎯</div>
+                    <div class="summary-value">68.5%</div>
+                    <div class="summary-label">Win Rate</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-icon">💵</div>
+                    <div class="summary-value positive">+$27,060</div>
+                    <div class="summary-label">Total P&L</div>
+                </div>
+            </div>
+
+            <!-- Active Positions -->
+            <div class="positions-section">
+                <div class="section-header">
+                    <h2 class="section-title"><span style="font-size: 16px;">⚡</span> Active Positions (3)</h2>
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <select class="filter-select" id="accountPositionFilter" onchange="filterPositions()" style="width: 150px;">
+                            <option value="all">All Accounts</option>
+                            <option value="ftmo">FTMO</option>
+                            <option value="topstep">TopStep</option>
+                            <option value="personal">Personal</option>
+                        </select>
+                        <button class="btn btn-danger" onclick="closeAllPositions()" style="font-size: 14px;">
+                            <span style="font-size: 16px;">🛑</span> Close All
+                        </button>
+                    </div>
+                </div>
+
+                <div id="activePositions">
+                    <div class="position-card" data-account="ftmo" id="position-1">
+                        <div class="position-side side-long">
+                            <span style="font-size: 14px;">🔺</span>
+                            LONG
+                        </div>
+                        <div class="position-info">
+                            <div class="position-symbol">MNQ - Micro NASDAQ</div>
+                            <div class="position-details">Entry: 15,298 | 2 contracts | 14:32 | FTMO</div>
+                        </div>
+                        <div>
+                            <div style="color: #9ca3af; font-size: 12px;">Target</div>
+                            <div style="font-weight: 600;" id="target-1">15,333</div>
+                        </div>
+                        <div>
+                            <div style="color: #9ca3af; font-size: 12px;">Stop</div>
+                            <div style="font-weight: 600;" id="stop-1">15,283</div>
+                        </div>
+                        <div class="position-pnl positive" id="pnl-1">+$180</div>
+                        <div class="position-actions">
+                            <button class="action-btn" onclick="modifyPosition(1)">Modify</button>
+                            <button class="action-btn" onclick="closePosition(1)">Close</button>
+                        </div>
+                    </div>
+
+                    <div class="position-card" data-account="topstep" id="position-2">
+                        <div class="position-side side-long">
+                            <span style="font-size: 14px;">🔺</span>
+                            LONG
+                        </div>
+                        <div class="position-info">
+                            <div class="position-symbol">MNQ - Micro NASDAQ</div>
+                            <div class="position-details">Entry: 15,315 | 1 contract | 15:47 | TopStep</div>
+                        </div>
+                        <div>
+                            <div style="color: #9ca3af; font-size: 12px;">Target</div>
+                            <div style="font-weight: 600;" id="target-2">15,335</div>
+                        </div>
+                        <div>
+                            <div style="color: #9ca3af; font-size: 12px;">Stop</div>
+                            <div style="font-weight: 600;" id="stop-2">15,305</div>
+                        </div>
+                        <div class="position-pnl positive" id="pnl-2">+$65</div>
+                        <div class="position-actions">
+                            <button class="action-btn" onclick="modifyPosition(2)">Modify</button>
+                            <button class="action-btn" onclick="closePosition(2)">Close</button>
+                        </div>
+                    </div>
+
+                    <div class="position-card" data-account="ftmo" id="position-3">
+                        <div class="position-side side-short">
+                            <span style="font-size: 14px;">🔻</span>
+                            SHORT
+                        </div>
+                        <div class="position-info">
+                            <div class="position-symbol">MNQ - Micro NASDAQ</div>
+                            <div class="position-details">Entry: 15,342 | 1 contract | 16:15 | FTMO</div>
+                        </div>
+                        <div>
+                            <div style="color: #9ca3af; font-size: 12px;">Target</div>
+                            <div style="font-weight: 600;" id="target-3">15,322</div>
+                        </div>
+                        <div>
+                            <div style="color: #9ca3af; font-size: 12px;">Stop</div>
+                            <div style="font-weight: 600;" id="stop-3">15,352</div>
+                        </div>
+                        <div class="position-pnl negative" id="pnl-3">-$40</div>
+                        <div class="position-actions">
+                            <button class="action-btn" onclick="modifyPosition(3)">Modify</button>
+                            <button class="action-btn" onclick="closePosition(3)">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trade History -->
+            <div class="history-section">
+                <div class="section-header">
+                    <h2 class="section-title"><span style="font-size: 16px;">📜</span> Trade History</h2>
+                </div>
+
+                <!-- Filters -->
+                <div class="filter-bar">
+                    <div class="filter-group">
+                        <span class="filter-label">Date Range:</span>
+                        <input type="date" class="filter-input" id="startDate" value="2025-07-01">
+                        <span style="color: #9ca3af;">to</span>
+                        <input type="date" class="filter-input" id="endDate" value="2025-07-29">
+                    </div>
+                    <div class="filter-group">
+                        <span class="filter-label">Strategy:</span>
+                        <select class="filter-select" id="strategyFilter" onchange="filterTrades()">
+                            <option value="all">All Strategies</option>
+                            <option value="morning">Morning Strategy</option>
+                            <option value="nyopen">NY Open Strategy</option>
+                            <option value="usorb">US ORB Strategy</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <span class="filter-label">Result:</span>
+                        <select class="filter-select" id="resultFilter" onchange="filterTrades()">
+                            <option value="all">All Trades</option>
+                            <option value="winners">Winners Only</option>
+                            <option value="losers">Losers Only</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-secondary" onclick="filterTrades()" style="font-size: 14px;">
+                        <span style="font-size: 16px;">🔍</span> Apply Filters
+                    </button>
+                </div>
+
+                <!-- Trade Table -->
+                <table>
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable('id')">ID ↕</th>
+                            <th onclick="sortTable('time')">Time ↕</th>
+                            <th onclick="sortTable('symbol')">Symbol ↕</th>
+                            <th onclick="sortTable('side')">Side ↕</th>
+                            <th onclick="sortTable('strategy')">Strategy ↕</th>
+                            <th onclick="sortTable('entry')">Entry ↕</th>
+                            <th onclick="sortTable('exit')">Exit ↕</th>
+                            <th onclick="sortTable('pnl')">P&L ↕</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tradeTableBody">
+                        <tr>
+                            <td class="trade-id">#T00127</td>
+                            <td>Today 11:15 AM</td>
+                            <td>MNQ</td>
+                            <td class="side-long" style="font-size: 14px;">LONG</td>
+                            <td><span class="strategy-badge badge-morning">Morning</span></td>
+                            <td>15,275</td>
+                            <td>15,305</td>
+                            <td class="positive">+$450</td>
+                            <td>
+                                <button class="action-btn" onclick="viewTradeDetails(127)">View</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="trade-id">#T00126</td>
+                            <td>Today 10:32 AM</td>
+                            <td>MNQ</td>
+                            <td class="side-short" style="font-size: 14px;">SHORT</td>
+                            <td><span class="strategy-badge badge-morning">Morning</span></td>
+                            <td>15,320</td>
+                            <td>15,335</td>
+                            <td class="negative">-$225</td>
+                            <td>
+                                <button class="action-btn" onclick="viewTradeDetails(126)">View</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="trade-id">#T00125</td>
+                            <td>Yesterday 3:23 PM</td>
+                            <td>MNQ</td>
+                            <td class="side-long" style="font-size: 14px;">LONG</td>
+                            <td><span class="strategy-badge badge-usorb">US ORB</span></td>
+                            <td>15,198</td>
+                            <td>15,218</td>
+                            <td class="positive">+$300</td>
+                            <td>
+                                <button class="action-btn" onclick="viewTradeDetails(125)">View</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="trade-id">#T00124</td>
+                            <td>Yesterday 2:45 PM</td>
+                            <td>MNQ</td>
+                            <td class="side-long" style="font-size: 14px;">LONG</td>
+                            <td><span class="strategy-badge badge-nyopen">NY Open</span></td>
+                            <td>15,290</td>
+                            <td>15,325</td>
+                            <td class="positive">+$525</td>
+                            <td>
+                                <button class="action-btn" onclick="viewTradeDetails(124)">View</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="trade-id">#T00123</td>
+                            <td>Yesterday 11:28 AM</td>
+                            <td>MNQ</td>
+                            <td class="side-short" style="font-size: 14px;">SHORT</td>
+                            <td><span class="strategy-badge badge-morning">Morning</span></td>
+                            <td>15,365</td>
+                            <td>15,380</td>
+                            <td class="negative">-$225</td>
+                            <td>
+                                <button class="action-btn" onclick="viewTradeDetails(123)">View</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Pagination -->
+                <div class="pagination">
+                    <button class="page-btn" onclick="changePage(-1)">←</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn" onclick="goToPage(2)">2</button>
+                    <button class="page-btn" onclick="goToPage(3)">3</button>
+                    <span style="color: #9ca3af;">...</span>
+                    <button class="page-btn" onclick="goToPage(26)">26</button>
+                    <button class="page-btn" onclick="changePage(1)">→</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <button class="quick-btn" onclick="openQuickTrade()" title="Quick Trade">
+            ⚡
+        </button>
+    </div>
+
+    <!-- Export Modal -->
+    <div class="modal" id="exportModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 1000; align-items: center; justify-content: center;">
+        <div class="modal-content" style="background: #1f2937; border-radius: 16px; padding: 32px; max-width: 500px; width: 90%;">
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <h3 style="font-size: 24px; font-weight: 700;"><span style="font-size: 20px;">📊</span> Export Trade Data</h3>
+                <button onclick="closeExportModal()" style="background: none; border: none; color: #9ca3af; font-size: 24px; cursor: pointer;">&times;</button>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+                <button class="export-option" onclick="exportFormat('csv')" style="padding: 16px; background: rgba(55, 65, 81, 0.5); border: 1px solid #374151; border-radius: 8px; color: white; cursor: pointer; transition: all 0.2s ease; text-align: left;">
+                    <div style="font-weight: 600; margin-bottom: 4px;"><span style="font-size: 16px;">📄</span> CSV Format</div>
+                    <div style="font-size: 12px; color: #9ca3af;">Comma-separated values for Excel/Google Sheets</div>
+                </button>
+                
+                <button class="export-option" onclick="exportFormat('pdf')" style="padding: 16px; background: rgba(55, 65, 81, 0.5); border: 1px solid #374151; border-radius: 8px; color: white; cursor: pointer; transition: all 0.2s ease; text-align: left;">
+                    <div style="font-weight: 600; margin-bottom: 4px;"><span style="font-size: 16px;">📑</span> PDF Report</div>
+                    <div style="font-size: 12px; color: #9ca3af;">Formatted report with charts and summaries</div>
+                </button>
+                
+                <button class="export-option" onclick="exportFormat('excel')" style="padding: 16px; background: rgba(55, 65, 81, 0.5); border: 1px solid #374151; border-radius: 8px; color: white; cursor: pointer; transition: all 0.2s ease; text-align: left;">
+                    <div style="font-weight: 600; margin-bottom: 4px;"><span style="font-size: 16px;">📊</span> Excel Workbook</div>
+                    <div style="font-size: 12px; color: #9ca3af;">Multi-sheet workbook with analysis</div>
+                </button>
+                
+                <button class="export-option" onclick="exportFormat('json')" style="padding: 16px; background: rgba(55, 65, 81, 0.5); border: 1px solid #374151; border-radius: 8px; color: white; cursor: pointer; transition: all 0.2s ease; text-align: left;">
+                    <div style="font-weight: 600; margin-bottom: 4px;"><span style="font-size: 16px;">🔧</span> JSON Data</div>
+                    <div style="font-size: 12px; color: #9ca3af;">Raw data for developers/API integration</div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Trade Modal -->
+    <div class="modal" id="quickTradeModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 1000; align-items: center; justify-content: center;">
+        <div class="modal-content" style="background: #1f2937; border-radius: 16px; padding: 32px; max-width: 500px; width: 90%;">
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <h3 style="font-size: 24px; font-weight: 700;"><span style="font-size: 20px;">⚡</span> Quick Trade</h3>
+                <button onclick="closeQuickTradeModal()" style="background: none; border: none; color: #9ca3af; font-size: 24px; cursor: pointer;">&times;</button>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+                <div>
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #9ca3af;">Direction</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <button id="longBtn" onclick="selectDirection('LONG')" style="padding: 12px; background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; border-radius: 8px; color: #10b981; cursor: pointer; font-weight: 600;">
+                            <span style="font-size: 14px;">🔺</span> LONG
+                        </button>
+                        <button id="shortBtn" onclick="selectDirection('SHORT')" style="padding: 12px; background: rgba(55, 65, 81, 0.5); border: 1px solid #374151; border-radius: 8px; color: white; cursor: pointer; font-weight: 600;">
+                            <span style="font-size: 14px;">🔻</span> SHORT
+                        </button>
+                    </div>
+                </div>
+                
+                <div>
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #9ca3af;">Contracts</label>
+                    <input type="number" id="contractsInput" min="1" max="10" value="1" style="width: 100%; padding: 12px; background: rgba(55, 65, 81, 0.5); border: 1px solid #374151; border-radius: 8px; color: white; font-size: 14px;">
+                </div>
+                
+                <div>
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #9ca3af;">Account</label>
+                    <select id="accountSelect" style="width: 100%; padding: 12px; background: rgba(55, 65, 81, 0.5); border: 1px solid #374151; border-radius: 8px; color: white; font-size: 14px;">
+                        <option value="ftmo">FTMO</option>
+                        <option value="topstep">TopStep</option>
+                        <option value="personal">Personal</option>
+                    </select>
+                </div>
+                
+                <button onclick="executeQuickTrade()" style="padding: 14px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 8px; color: white; font-weight: 600; cursor: pointer; font-size: 16px;">
+                    Execute Trade
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modify Position Modal -->
+    <div class="modal" id="modifyModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 1000; align-items: center; justify-content: center;">
+        <div class="modal-content" style="background: #1f2937; border-radius: 16px; padding: 32px; max-width: 500px; width: 90%;">
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <h3 style="font-size: 24px; font-weight: 700;">⚙️ Modify Position</h3>
+                <button onclick="closeModifyModal()" style="background: none; border: none; color: #9ca3af; font-size: 24px; cursor: pointer;">&times;</button>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+                <div>
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #9ca3af;">Stop Loss</label>
+                    <input type="text" id="modifyStopInput" style="width: 100%; padding: 12px; background: rgba(55, 65, 81, 0.5); border: 1px solid #374151; border-radius: 8px; color: white; font-size: 14px;">
+                    <div style="font-size: 12px; color: #6b7280; margin-top: 4px;">Current: <span id="currentStop"></span></div>
+                </div>
+                
+                <div>
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #9ca3af;">Target Price</label>
+                    <input type="text" id="modifyTargetInput" style="width: 100%; padding: 12px; background: rgba(55, 65, 81, 0.5); border: 1px solid #374151; border-radius: 8px; color: white; font-size: 14px;">
+                    <div style="font-size: 12px; color: #6b7280; margin-top: 4px;">Current: <span id="currentTarget"></span></div>
+                </div>
+                
+                <div style="display: flex; gap: 12px;">
+                    <button onclick="saveModification()" style="flex: 1; padding: 14px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 8px; color: white; font-weight: 600; cursor: pointer;">
+                        Save Changes
+                    </button>
+                    <button onclick="closeModifyModal()" style="flex: 1; padding: 14px; background: rgba(55, 65, 81, 0.5); border: 1px solid #374151; border-radius: 8px; color: white; font-weight: 600; cursor: pointer;">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Modal -->
+    <div class="modal" id="confirmModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 1000; align-items: center; justify-content: center;">
+        <div class="modal-content" style="background: #1f2937; border-radius: 16px; padding: 32px; max-width: 500px; width: 90%;">
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <h3 style="font-size: 24px; font-weight: 700;" id="confirmTitle">⚠️ Confirm Action</h3>
+                <button onclick="closeConfirmModal()" style="background: none; border: none; color: #9ca3af; font-size: 24px; cursor: pointer;">&times;</button>
+            </div>
+            
+            <p style="color: #d1d5db; margin-bottom: 24px;" id="confirmMessage"></p>
+            
+            <div style="display: flex; gap: 12px;">
+                <button onclick="confirmAction()" style="flex: 1; padding: 14px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); border: none; border-radius: 8px; color: white; font-weight: 600; cursor: pointer;">
+                    Confirm
+                </button>
+                <button onclick="closeConfirmModal()" style="flex: 1; padding: 14px; background: rgba(55, 65, 81, 0.5); border: 1px solid #374151; border-radius: 8px; color: white; font-weight: 600; cursor: pointer;">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let activePositionsCount = 3;
+        let selectedDirection = 'LONG';
+        let currentModifyId = null;
+        let pendingAction = null;
+        let pendingCallback = null;
+        let nextPositionId = 4;
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('💰 Trades Dashboard initialized');
+            
+            // Set today's date as end date
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('endDate').value = today;
+            
+            // Auto-refresh positions every 5 seconds
+            setInterval(window.updatePositions, 5000);
+            
+            // Add hover effects to export options
+            document.querySelectorAll('.export-option').forEach(btn => {
+                btn.addEventListener('mouseenter', function() {
+                    this.style.borderColor = '#667eea';
+                    this.style.background = 'rgba(102, 126, 234, 0.1)';
+                });
+                btn.addEventListener('mouseleave', function() {
+                    this.style.borderColor = '#374151';
+                    this.style.background = 'rgba(55, 65, 81, 0.5)';
+                });
+            });
+            
+            // Add event listeners as backup for action buttons
+            document.querySelectorAll('.action-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    console.log('Action button clicked:', this.textContent);
+                });
+            });
+            
+            // Add keyboard support for modals
+            document.getElementById('modifyStopInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    document.getElementById('modifyTargetInput').focus();
+                }
+            });
+            
+            document.getElementById('modifyTargetInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    saveModification();
+                }
+            });
+            
+            // ESC key to close modals
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    // Close any open modal
+                    document.querySelectorAll('.modal').forEach(modal => {
+                        if (modal.style.display === 'flex') {
+                            modal.style.display = 'none';
+                        }
+                    });
+                    document.body.classList.remove('modal-open');
+                    closeConfirmModal();
+                    closeModifyModal();
+                }
+            });
+            
+            // Test button functionality
+            console.log('Functions attached to window:', {
+                closePosition: typeof window.closePosition,
+                modifyPosition: typeof window.modifyPosition,
+                closeAllPositions: typeof window.closeAllPositions
+            });
+        });
+
+        // Position Management Functions
+        window.closePosition = function(id) {
+            console.log('closePosition called with id:', id);
+            
+            // Set up the confirm modal
+            document.getElementById('confirmTitle').innerHTML = '⚠️ Close Position';
+            document.getElementById('confirmMessage').textContent = 'Close this position at market price?';
+            
+            pendingAction = 'closePosition';
+            pendingCallback = function() {
+                const positionCard = document.getElementById(`position-${id}`);
+                if (!positionCard) {
+                    console.error('Position card not found:', `position-${id}`);
+                    return;
+                }
+                const pnlElement = document.getElementById(`pnl-${id}`);
+                const finalPnL = pnlElement ? pnlElement.textContent : 'Unknown';
+                
+                // Animate closing
+                positionCard.style.transition = 'all 0.5s ease';
+                positionCard.style.background = 'rgba(16, 185, 129, 0.1)';
+                positionCard.style.opacity = '0.7';
+                
+                setTimeout(() => {
+                    positionCard.style.transform = 'translateX(100%)';
+                    positionCard.style.opacity = '0';
+                    
+                    setTimeout(() => {
+                        positionCard.remove();
+                        updateActiveCount();
+                        showToast(`✅ Position closed at market! P&L: ${finalPnL}`, 'success');
+                    }, 500);
+                }, 100);
+            };
+            
+            document.getElementById('confirmModal').style.display = 'flex';
+            document.body.classList.add('modal-open');
+        }
+
+        window.modifyPosition = function(id) {
+            console.log('modifyPosition called with id:', id);
+            currentModifyId = id;
+            
+            const currentStop = document.getElementById(`stop-${id}`);
+            const currentTarget = document.getElementById(`target-${id}`);
+            
+            if (!currentStop || !currentTarget) {
+                console.error('Stop or target element not found');
+                return;
+            }
+            
+            // Set current values in the modal
+            document.getElementById('currentStop').textContent = currentStop.textContent;
+            document.getElementById('currentTarget').textContent = currentTarget.textContent;
+            document.getElementById('modifyStopInput').value = '';
+            document.getElementById('modifyTargetInput').value = '';
+            
+            // Show modify modal
+            document.getElementById('modifyModal').style.display = 'flex';
+            document.body.classList.add('modal-open');
+            
+            // Focus on the first input after a short delay
+            setTimeout(() => {
+                document.getElementById('modifyStopInput').focus();
+            }, 100);
+        }
+
+        window.closeAllPositions = function() {
+            console.log('closeAllPositions called');
+            const activePositions = document.querySelectorAll('.position-card').length;
+            if (activePositions === 0) {
+                showToast('No active positions to close', 'info');
+                return;
+            }
+            
+            // Set up the confirm modal
+            document.getElementById('confirmTitle').innerHTML = '⚠️ Close ALL Positions';
+            document.getElementById('confirmMessage').textContent = `Close ALL active positions at market? This will close ${activePositions} position${activePositions > 1 ? 's' : ''} immediately.`;
+            
+            pendingAction = 'closeAll';
+            pendingCallback = function() {
+                const positions = document.querySelectorAll('.position-card');
+                positions.forEach((card, index) => {
+                    setTimeout(() => {
+                        card.style.transition = 'all 0.5s ease';
+                        card.style.background = 'rgba(16, 185, 129, 0.1)';
+                        card.style.transform = 'translateX(100%)';
+                        card.style.opacity = '0';
+                        
+                        setTimeout(() => {
+                            card.remove();
+                        }, 500);
+                    }, index * 200);
+                });
+                
+                setTimeout(() => {
+                    activePositionsCount = 0;
+                    updateActiveCount();
+                    showToast('✅ All positions closed successfully!', 'success');
+                }, 1000);
+            };
+            
+            document.getElementById('confirmModal').style.display = 'flex';
+        }
+
+        // Modal Control Functions
+        window.closeModifyModal = function() {
+            document.getElementById('modifyModal').style.display = 'none';
+            document.body.classList.remove('modal-open');
+            currentModifyId = null;
+        }
+
+        window.saveModification = function() {
+            if (currentModifyId === null) return;
+            
+            const newStop = document.getElementById('modifyStopInput').value;
+            const newTarget = document.getElementById('modifyTargetInput').value;
+            
+            if (newStop) {
+                document.getElementById(`stop-${currentModifyId}`).textContent = newStop;
+                document.getElementById(`stop-${currentModifyId}`).style.color = '#10b981';
+                setTimeout(() => {
+                    document.getElementById(`stop-${currentModifyId}`).style.color = '';
+                }, 2000);
+            }
+            
+            if (newTarget) {
+                document.getElementById(`target-${currentModifyId}`).textContent = newTarget;
+                document.getElementById(`target-${currentModifyId}`).style.color = '#10b981';
+                setTimeout(() => {
+                    document.getElementById(`target-${currentModifyId}`).style.color = '';
+                }, 2000);
+            }
+            
+            if (newStop || newTarget) {
+                showToast('✅ Position modified successfully!', 'success');
+            }
+            
+            closeModifyModal();
+        }
+
+        window.closeConfirmModal = function() {
+            document.getElementById('confirmModal').style.display = 'none';
+            document.body.classList.remove('modal-open');
+            pendingAction = null;
+            pendingCallback = null;
+        }
+
+        window.confirmAction = function() {
+            if (pendingCallback) {
+                pendingCallback();
+            }
+            closeConfirmModal();
+        }
+
+        function updateActiveCount() {
+            const positions = document.querySelectorAll('.position-card').length;
+            document.querySelector('.section-title').innerHTML = `<span style="font-size: 16px;">⚡</span> Active Positions (${positions})`;
+        }
+
+        // Trade History Functions
+        window.viewTradeDetails = function(tradeId) {
+            showToast(`Opening trade details for #T00${tradeId}...`, 'info');
+            // In production, this would open a detailed modal
+        }
+
+        window.filterTrades = function() {
+            const strategy = document.getElementById('strategyFilter').value;
+            const result = document.getElementById('resultFilter').value;
+            showToast('🔍 Filters applied to trade history', 'info');
+            // In production, this would actually filter the table
+        }
+
+        window.filterPositions = function() {
+            const filter = document.getElementById('accountPositionFilter').value;
+            const positions = document.querySelectorAll('.position-card');
+            
+            positions.forEach(card => {
+                if (filter === 'all' || card.dataset.account === filter) {
+                    card.style.display = 'grid';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        window.sortTable = function(column) {
+            showToast(`Sorting by ${column}...`, 'info');
+            // In production, this would sort the table data
+        }
+
+        window.changePage = function(direction) {
+            const currentPage = parseInt(document.querySelector('.page-btn.active').textContent);
+            const newPage = currentPage + direction;
+            if (newPage > 0 && newPage <= 26) {
+                goToPage(newPage);
+            }
+        }
+
+        window.goToPage = function(page) {
+            document.querySelectorAll('.page-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent == page) {
+                    btn.classList.add('active');
+                }
+            });
+            showToast(`Loading page ${page}...`, 'info');
+        }
+
+        // Export Functions
+        window.exportTrades = function() {
+            document.getElementById('exportModal').style.display = 'flex';
+            document.body.classList.add('modal-open');
+        }
+
+        window.closeExportModal = function() {
+            document.getElementById('exportModal').style.display = 'none';
+            document.body.classList.remove('modal-open');
+        }
+
+        window.exportFormat = function(format) {
+            closeExportModal();
+            showToast(`Generating ${format.toUpperCase()} export...`, 'info');
+            
+            setTimeout(() => {
+                let filename = '';
+                let content = '';
+                let mimeType = '';
+                
+                switch(format) {
+                    case 'csv':
+                        filename = `trades_export_${new Date().toISOString().split('T')[0]}.csv`;
+                        content = `Date,Time,Symbol,Side,Strategy,Entry,Exit,P&L,Result
+2025-07-29,11:15,MNQ,LONG,Morning,15275,15305,+450,WIN
+2025-07-29,10:32,MNQ,SHORT,Morning,15320,15335,-225,LOSS
+2025-07-28,15:23,MNQ,LONG,US ORB,15198,15218,+300,WIN
+2025-07-28,14:45,MNQ,LONG,NY Open,15290,15325,+525,WIN
+2025-07-28,11:28,MNQ,SHORT,Morning,15365,15380,-225,LOSS`;
+                        mimeType = 'text/csv';
+                        break;
+                        
+                    case 'pdf':
+                        filename = `trade_report_${new Date().toISOString().split('T')[0]}.pdf`;
+                        content = 'PDF content would be generated here';
+                        mimeType = 'application/pdf';
+                        showToast('📄 PDF report generated! (Demo version)', 'success');
+                        return; // Skip download for PDF demo
+                        
+                    case 'excel':
+                        filename = `trades_analysis_${new Date().toISOString().split('T')[0]}.xlsx`;
+                        content = 'Excel content would be generated here';
+                        mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+                        showToast('📊 Excel workbook generated! (Demo version)', 'success');
+                        return; // Skip download for Excel demo
+                        
+                    case 'json':
+                        filename = `trades_data_${new Date().toISOString().split('T')[0]}.json`;
+                        content = JSON.stringify({
+                            summary: {
+                                totalTrades: 127,
+                                winningTrades: 87,
+                                losingTrades: 40,
+                                winRate: 0.685,
+                                totalPnL: 27060
+                            },
+                            trades: [
+                                {id: 'T00127', date: '2025-07-29', time: '11:15', symbol: 'MNQ', side: 'LONG', strategy: 'Morning', entry: 15275, exit: 15305, pnl: 450},
+                                {id: 'T00126', date: '2025-07-29', time: '10:32', symbol: 'MNQ', side: 'SHORT', strategy: 'Morning', entry: 15320, exit: 15335, pnl: -225}
+                            ]
+                        }, null, 2);
+                        mimeType = 'application/json';
+                        break;
+                }
+                
+                // Create and download file
+                const blob = new Blob([content], { type: mimeType });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                
+                showToast(`✅ ${format.toUpperCase()} export complete!`, 'success');
+            }, 1500);
+        }
+
+        window.refreshTrades = function() {
+            const btn = event.target.closest('button');
+            const originalHTML = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span style="font-size: 16px;">⏳</span> Refreshing...';
+            
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.innerHTML = originalHTML;
+                updatePositions();
+                showToast('✅ Trades refreshed!', 'success');
+            }, 1500);
+        }
+
+        // Quick Trade Functions
+        window.openQuickTrade = function() {
+            document.getElementById('quickTradeModal').style.display = 'flex';
+            document.body.classList.add('modal-open');
+            // Reset to default state
+            selectedDirection = 'LONG';
+            document.getElementById('contractsInput').value = '1';
+            updateDirectionButtons();
+        }
+
+        window.closeQuickTradeModal = function() {
+            document.getElementById('quickTradeModal').style.display = 'none';
+            document.body.classList.remove('modal-open');
+        }
+
+        window.selectDirection = function(direction) {
+            selectedDirection = direction;
+            updateDirectionButtons();
+        }
+
+        window.updateDirectionButtons = function() {
+            const longBtn = document.getElementById('longBtn');
+            const shortBtn = document.getElementById('shortBtn');
+            
+            if (selectedDirection === 'LONG') {
+                longBtn.style.background = 'rgba(16, 185, 129, 0.2)';
+                longBtn.style.borderColor = '#10b981';
+                longBtn.style.color = '#10b981';
+                longBtn.innerHTML = '<span style="font-size: 14px;">🔺</span> LONG';
+                
+                shortBtn.style.background = 'rgba(55, 65, 81, 0.5)';
+                shortBtn.style.borderColor = '#374151';
+                shortBtn.style.color = 'white';
+                shortBtn.innerHTML = '<span style="font-size: 14px;">🔻</span> SHORT';
+            } else {
+                shortBtn.style.background = 'rgba(239, 68, 68, 0.2)';
+                shortBtn.style.borderColor = '#ef4444';
+                shortBtn.style.color = '#ef4444';
+                shortBtn.innerHTML = '<span style="font-size: 14px;">🔻</span> SHORT';
+                
+                longBtn.style.background = 'rgba(55, 65, 81, 0.5)';
+                longBtn.style.borderColor = '#374151';
+                longBtn.style.color = 'white';
+                longBtn.innerHTML = '<span style="font-size: 14px;">🔺</span> LONG';
+            }
+        }
+
+        window.executeQuickTrade = function() {
+            const contracts = document.getElementById('contractsInput').value;
+            const account = document.getElementById('accountSelect').value;
+            
+            if (contracts < 1 || contracts > 10) {
+                showToast('❌ Please enter 1-10 contracts', 'error');
+                return;
+            }
+            
+            closeQuickTradeModal();
+            showToast(`⚡ ${selectedDirection} trade executed! ${contracts} contracts on ${account.toUpperCase()}`, 'success');
+            
+            // Add a new position to the display
+            const newId = nextPositionId++;
+            const newPositionHTML = `
+                <div class="position-card" data-account="${account}" id="position-${newId}" style="opacity: 0; transform: translateX(-100%);">
+                    <div class="position-side side-${selectedDirection.toLowerCase()}">
+                        <span style="font-size: 14px;">${selectedDirection === 'LONG' ? '🔺' : '🔻'}</span>
+                        ${selectedDirection}
+                    </div>
+                    <div class="position-info">
+                        <div class="position-symbol">MNQ - Micro NASDAQ</div>
+                        <div class="position-details">Entry: Market | ${contracts} contract${contracts > 1 ? 's' : ''} | Just now | ${account.toUpperCase()}</div>
+                    </div>
+                    <div>
+                        <div style="color: #9ca3af; font-size: 12px;">Target</div>
+                        <div style="font-weight: 600;" id="target-${newId}">Calculating...</div>
+                    </div>
+                    <div>
+                        <div style="color: #9ca3af; font-size: 12px;">Stop</div>
+                        <div style="font-weight: 600;" id="stop-${newId}">Calculating...</div>
+                    </div>
+                    <div class="position-pnl" id="pnl-${newId}">$0</div>
+                    <div class="position-actions">
+                        <button class="action-btn" onclick="modifyPosition(${newId})">Modify</button>
+                        <button class="action-btn" onclick="closePosition(${newId})">Close</button>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('activePositions').insertAdjacentHTML('afterbegin', newPositionHTML);
+            
+            // Animate the new position in
+            setTimeout(() => {
+                const newCard = document.getElementById(`position-${newId}`);
+                newCard.style.transition = 'all 0.5s ease';
+                newCard.style.opacity = '1';
+                newCard.style.transform = 'translateX(0)';
+                updateActiveCount();
+                
+                // Set calculated stop and target after a moment
+                setTimeout(() => {
+                    const basePrice = 15300 + Math.floor(Math.random() * 100);
+                    const stopOffset = selectedDirection === 'LONG' ? -15 : 15;
+                    const targetOffset = selectedDirection === 'LONG' ? 25 : -25;
+                    
+                    document.getElementById(`stop-${newId}`).textContent = (basePrice + stopOffset).toLocaleString();
+                    document.getElementById(`target-${newId}`).textContent = (basePrice + targetOffset).toLocaleString();
+                }, 1000);
+            }, 100);
+        }
+
+        // Update Positions (live P&L simulation)
+        function updatePositions() {
+            const positions = [
+                { id: 'pnl-1', base: 180, variance: 50 },
+                { id: 'pnl-2', base: 65, variance: 30 },
+                { id: 'pnl-3', base: -40, variance: 20 }
+            ];
+            
+            positions.forEach(pos => {
+                const element = document.getElementById(pos.id);
+                if (element) {
+                    const variation = (Math.random() - 0.5) * pos.variance;
+                    const newValue = Math.round(pos.base + variation);
+                    const sign = newValue >= 0 ? '+' : '';
+                    element.textContent = `${sign}${Math.abs(newValue)}`;
+                    element.className = 'position-pnl ' + (newValue >= 0 ? 'positive' : 'negative');
+                }
+            });
+        }
+
+        // Utility Functions
+        function showToast(message, type = 'info') {
+            // Remove any existing toasts
+            const existingToast = document.querySelector('.toast');
+            if (existingToast) {
+                existingToast.remove();
+            }
+            
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const icons = {
+                success: '✅',
+                error: '❌',
+                info: 'ℹ️'
+            };
+            
+            toast.innerHTML = `
+                <span class="toast-icon">${icons[type]}</span>
+                <span class="toast-message">${message}</span>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => {
+                    if (document.body.contains(toast)) {
+                        document.body.removeChild(toast);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                if (event.target.id === 'confirmModal') {
+                    closeConfirmModal();
+                } else if (event.target.id === 'modifyModal') {
+                    closeModifyModal();
+                } else if (event.target.id === 'exportModal') {
+                    closeExportModal();
+                } else if (event.target.id === 'quickTradeModal') {
+                    closeQuickTradeModal();
+                } else {
+                    event.target.style.display = 'none';
+                    document.body.classList.remove('modal-open');
+                }
+            }
+        }
+    </script>
+
+    <!-- Load dashboard connector -->
+    <!-- <script src="dashboard_connector.js"></script> -->
+</body>
+</html>
