@@ -1,0 +1,3161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Trading Pal - Risk Monitor v81 Complete</title>
+    <meta name="description" content="Comprehensive risk monitoring and management with all sections">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0b0d;
+            color: #ffffff;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 260px;
+            height: 100vh;
+            background: linear-gradient(180deg, #1a1b23 0%, #151621 100%);
+            border-right: 1px solid #2a2d3a;
+            padding: 24px;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 32px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #2a2d3a;
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-section {
+            margin-bottom: 24px;
+        }
+
+        .nav-section-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #6b7280;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 4px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            color: #9ca3af;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+
+        .nav-link:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: #ffffff;
+        }
+
+        .nav-link.active {
+            background: rgba(102, 126, 234, 0.2);
+            color: #667eea;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            padding: 24px;
+            min-height: 100vh;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        #system-status {
+            font-weight: 600;
+            padding: 8px 16px;
+            background: rgba(26, 27, 35, 0.8);
+            border: 1px solid #2a2d3a;
+            border-radius: 8px;
+        }
+
+        .status-operational {
+            color: #10b981;
+        }
+
+        .status-locked {
+            color: #ef4444;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .risk-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .overview-card {
+            background: linear-gradient(135deg, #1a1b23 0%, #151621 100%);
+            border: 1px solid #2a2d3a;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .overview-card:hover {
+            border-color: #374151;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .overview-label {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .overview-value {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .overview-change {
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .positive { color: #10b981; }
+        .negative { color: #ef4444; }
+        .warning { color: #f59e0b; }
+        .neutral { color: #9ca3af; }
+
+        .section-container {
+            margin-bottom: 24px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            background: rgba(26, 27, 35, 0.8);
+            border: 1px solid #2a2d3a;
+            border-radius: 12px 12px 0 0;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s ease;
+        }
+
+        .section-header:hover {
+            background: rgba(26, 27, 35, 0.95);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .collapse-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .section-container.collapsed .collapse-icon {
+            transform: rotate(-90deg);
+        }
+
+        .section-content {
+            background: rgba(26, 27, 35, 0.5);
+            border: 1px solid #2a2d3a;
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            padding: 24px;
+            transition: max-height 0.3s ease, opacity 0.3s ease;
+            overflow: hidden;
+        }
+
+        .section-container.collapsed .section-content {
+            max-height: 0;
+            padding: 0 24px;
+            opacity: 0;
+            border: none;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            position: relative;
+            overflow: hidden;
+            color: white;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:active::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .btn-success {
+            background: #10b981;
+        }
+
+        .btn-warning {
+            background: #f59e0b;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .btn-restart {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .control-section {
+            background: rgba(55, 65, 81, 0.2);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #374151;
+        }
+
+        .control-section h4 {
+            font-size: 14px;
+            margin-bottom: 16px;
+            color: #e5e7eb;
+        }
+
+        .control-buttons {
+            display: grid;
+            gap: 8px;
+        }
+
+        .exposure-controls {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .market-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            font-size: 14px;
+        }
+
+        .position-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .position-table th {
+            padding: 12px;
+            text-align: left;
+            font-size: 12px;
+            color: #9ca3af;
+            border-bottom: 1px solid #374151;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .position-table td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(55, 65, 81, 0.5);
+            font-size: 14px;
+        }
+
+        .position-table tr {
+            transition: background 0.2s ease;
+        }
+
+        .position-table tr:hover {
+            background: rgba(55, 65, 81, 0.2);
+        }
+
+        .exposure-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 8px 16px;
+            background: rgba(55, 65, 81, 0.3);
+            border: 1px solid #374151;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+
+        .tab:hover {
+            background: rgba(55, 65, 81, 0.4);
+            border-color: #4b5563;
+        }
+
+        .tab.active {
+            background: rgba(102, 126, 234, 0.2);
+            color: #667eea;
+            border-color: #667eea;
+        }
+
+        .performance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+
+        .metric-box {
+            background: rgba(55, 65, 81, 0.2);
+            padding: 16px;
+            border-radius: 8px;
+            border-left: 3px solid #667eea;
+            transition: all 0.2s ease;
+        }
+
+        .metric-box:hover {
+            background: rgba(55, 65, 81, 0.3);
+            transform: translateX(2px);
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-bottom: 4px;
+        }
+
+        .metric-value {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .market-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .market-card {
+            background: rgba(55, 65, 81, 0.2);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #374151;
+            transition: all 0.2s ease;
+        }
+
+        .market-card:hover {
+            border-color: #4b5563;
+            transform: translateY(-2px);
+        }
+
+        .market-card h4 {
+            font-size: 14px;
+            color: #9ca3af;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .account-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .account-card {
+            background: rgba(55, 65, 81, 0.2);
+            border: 1px solid #374151;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .account-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            cursor: pointer;
+            background: rgba(30, 30, 35, 0.3);
+            user-select: none;
+            transition: background 0.2s ease;
+        }
+
+        .account-header:hover {
+            background: rgba(30, 30, 35, 0.5);
+        }
+
+        .account-body {
+            padding: 20px;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+            overflow: hidden;
+        }
+
+        .account-card.collapsed .account-body {
+            max-height: 0;
+            padding: 0 20px;
+        }
+
+        .rule-section {
+            margin-bottom: 20px;
+        }
+
+        .rule-section h4 {
+            font-size: 14px;
+            margin-bottom: 12px;
+            color: #e5e7eb;
+        }
+
+        .rule-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .rule-name {
+            flex: 1;
+            color: #9ca3af;
+        }
+
+        .rule-value {
+            margin-right: 12px;
+        }
+
+        .progress-bar {
+            flex: 0 0 100px;
+            height: 6px;
+            background: rgba(55, 65, 81, 0.5);
+            border-radius: 3px;
+            margin-right: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.3s ease;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .progress-safe { background: #10b981; }
+        .progress-warning { background: #f59e0b; }
+        .progress-danger { background: #ef4444; }
+
+        .mini-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin-top: 12px;
+        }
+
+        .mini-table th,
+        .mini-table td {
+            padding: 8px 12px;
+            text-align: left;
+            border: 1px solid #374151;
+        }
+
+        .mini-table th {
+            background: rgba(55, 65, 81, 0.3);
+            font-weight: 600;
+        }
+
+        .mini-table td {
+            background: rgba(30, 30, 35, 0.3);
+        }
+
+        .milestone-list {
+            background: rgba(55, 65, 81, 0.2);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .milestone-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(55, 65, 81, 0.5);
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .milestone-item:last-child {
+            border-bottom: none;
+        }
+
+        .milestone-item.active {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .milestone-item:hover {
+            padding-left: 8px;
+        }
+
+        .withdrawal-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .withdrawal-card {
+            background: rgba(55, 65, 81, 0.3);
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .withdrawal-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .alert-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .alert-item {
+            display: flex;
+            align-items: start;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(55, 65, 81, 0.2);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 13px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .alert-item:hover {
+            background: rgba(55, 65, 81, 0.3);
+            transform: translateX(4px);
+        }
+
+        .alert-icon {
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .alert-content {
+            flex: 1;
+        }
+
+        .alert-time {
+            font-size: 11px;
+            color: #9ca3af;
+            margin-top: 4px;
+        }
+
+        .alert-high {
+            border-left: 3px solid #ef4444;
+        }
+
+        .alert-medium {
+            border-left: 3px solid #f59e0b;
+        }
+
+        .alert-low {
+            border-left: 3px solid #10b981;
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+            align-items: center;
+        }
+
+        select {
+            padding: 8px 12px;
+            background: rgba(55, 65, 81, 0.3);
+            border: 1px solid #374151;
+            border-radius: 6px;
+            color: #e5e7eb;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        select:hover {
+            background: rgba(55, 65, 81, 0.4);
+            border-color: #4b5563;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .date-filter {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        input[type="date"] {
+            padding: 8px 12px;
+            background: rgba(55, 65, 81, 0.3);
+            border: 1px solid #374151;
+            border-radius: 6px;
+            color: #e5e7eb;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        input[type="date"]:hover {
+            background: rgba(55, 65, 81, 0.4);
+            border-color: #4b5563;
+        }
+
+        input[type="date"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .editable {
+            background: rgba(55, 65, 81, 0.3);
+            border: 1px solid transparent;
+            padding: 2px 6px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .editable:hover {
+            border-color: #667eea;
+            background: rgba(55, 65, 81, 0.4);
+        }
+
+        .editable:focus {
+            outline: none;
+            border-color: #667eea;
+            background: rgba(55, 65, 81, 0.5);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .info-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            background: rgba(102, 126, 234, 0.2);
+            color: #667eea;
+            border-radius: 50%;
+            font-size: 10px;
+            cursor: help;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .info-icon:hover {
+            background: rgba(102, 126, 234, 0.3);
+            transform: scale(1.1);
+        }
+
+        .info-icon:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1a1b23;
+            color: #e5e7eb;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            white-space: nowrap;
+            border: 1px solid #374151;
+            z-index: 100;
+            margin-bottom: 4px;
+            animation: tooltipFade 0.2s ease;
+            max-width: 300px;
+            white-space: normal;
+            text-align: left;
+        }
+
+        @keyframes tooltipFade {
+            from { opacity: 0; transform: translateX(-50%) translateY(4px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 9999;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #1a1b23;
+            border: 1px solid #374151;
+            border-radius: 12px;
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+            animation: modalSlide 0.3s ease;
+        }
+
+        @keyframes modalSlide {
+            from { 
+                opacity: 0; 
+                transform: translate(-50%, -50%) scale(0.9); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translate(-50%, -50%) scale(1); 
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: #9ca3af;
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .modal-close:hover {
+            color: #ef4444;
+        }
+
+        .export-options {
+            display: grid;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .export-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: rgba(55, 65, 81, 0.2);
+            border: 1px solid #374151;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .export-option:hover {
+            background: rgba(55, 65, 81, 0.3);
+            border-color: #667eea;
+        }
+
+        .export-option.selected {
+            background: rgba(102, 126, 234, 0.2);
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+        }
+
+        #custom-date-section {
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 9999;
+            backdrop-filter: blur(4px);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-simple {
+            background: #1a1b23;
+            border: 1px solid #374151;
+            border-radius: 12px;
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+            animation: slideUp 0.3s ease;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-simple-header {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-simple-body {
+            color: #d1d5db;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: white;
+        }
+
+        .modal-btn-cancel {
+            background: #4b5563;
+        }
+
+        .modal-btn-cancel:hover {
+            background: #6b7280;
+        }
+
+        .modal-btn-confirm {
+            background: #ef4444;
+        }
+
+        .modal-btn-confirm:hover {
+            background: #dc2626;
+        }
+
+        .modal-btn-primary {
+            background: #3b82f6;
+        }
+
+        .modal-btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .modal-btn-restart {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            z-index: 10000;
+            max-width: 400px;
+            animation: slideIn 0.3s ease;
+            color: white;
+        }
+
+        .notification-success {
+            background: #10b981;
+        }
+
+        .notification-warning {
+            background: #f59e0b;
+        }
+
+        .notification-danger {
+            background: #ef4444;
+        }
+
+        .notification-info {
+            background: #3b82f6;
+        }
+
+        .notification-title {
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        #restart-panel {
+            display: none;
+            margin-top: 24px;
+            padding: 20px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 2px solid #ef4444;
+            border-radius: 8px;
+        }
+
+        .emergency-locked {
+            pointer-events: none;
+            opacity: 0.3;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #667eea;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .market-grid,
+            .control-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .exposure-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <span style="font-size: 28px;">🤖</span>
+            <span class="logo-text">My Trading Pal</span>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">MAIN</div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="dashboard.html" class="nav-link">
+                        <span>📊</span>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="trades.html" class="nav-link">
+                        <span>💹</span>
+                        <span>Trade Management</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="accounts.html" class="nav-link">
+                        <span>💼</span>
+                        <span>Accounts</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="strategies.html" class="nav-link">
+                        <span>📈</span>
+                        <span>Strategies</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">AI SYSTEM</div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="ai-status.html" class="nav-link">
+                        <span>🤖</span>
+                        <span>AI Status</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="performance.html" class="nav-link">
+                        <span>📊</span>
+                        <span>Performance</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="compliance.html" class="nav-link active">
+                        <span>🛡️</span>
+                        <span>Risk Monitor</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">ANALYTICS</div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="reports.html" class="nav-link">
+                        <span>📋</span>
+                        <span>Reports</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="alerts.html" class="nav-link">
+                        <span>🔔</span>
+                        <span>System Logs</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">SETTINGS</div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="settings.html" class="nav-link">
+                        <span>⚙️</span>
+                        <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1>🛡️ Risk Monitor</h1>
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <div id="system-status">
+                    System: <span id="status-text" class="status-operational">OPERATIONAL ✅</span>
+                </div>
+                <button class="btn btn-danger" id="emergency-stop-header">
+                    🚨 Emergency Stop
+                </button>
+                <button class="btn btn-success" id="risk-report-btn">
+                    📊 Risk Report
+                </button>
+            </div>
+        </div>
+
+        <!-- Risk Overview Dashboard -->
+        <div class="risk-overview">
+            <div class="overview-card">
+                <div class="overview-label">
+                    <span>💰</span>
+                    <span>Portfolio Value</span>
+                </div>
+                <div class="overview-value" id="portfolio-value">$127,450</div>
+                <div class="overview-change positive">
+                    <span>↗</span>
+                    <span>+15.2% Month</span>
+                </div>
+            </div>
+
+            <div class="overview-card">
+                <div class="overview-label">
+                    <span>📊</span>
+                    <span>Avg R:R</span>
+                </div>
+                <div class="overview-value positive" id="avg-rr">2.3:1</div>
+                <div class="overview-change positive">
+                    <span>↗</span>
+                    <span>from 2.1</span>
+                </div>
+            </div>
+
+            <div class="overview-card">
+                <div class="overview-label">
+                    <span>📈</span>
+                    <span>Win Rate</span>
+                </div>
+                <div class="overview-value positive" id="win-rate">67.3%</div>
+                <div class="overview-change neutral">
+                    <span>↗</span>
+                    <span>Last 50</span>
+                </div>
+            </div>
+
+            <div class="overview-card">
+                <div class="overview-label">
+                    <span>⚡</span>
+                    <span>Exposure</span>
+                </div>
+                <div class="overview-value warning" id="current-exposure-card">1.8%</div>
+                <div class="overview-change neutral">
+                    <span>•</span>
+                    <span>4 positions</span>
+                </div>
+            </div>
+
+            <div class="overview-card">
+                <div class="overview-label">
+                    <span>🎯</span>
+                    <span>Daily P&L</span>
+                </div>
+                <div class="overview-value positive" id="daily-pnl">+$2,145</div>
+                <div class="overview-change positive">
+                    <span>✓</span>
+                    <span>85.8% of target</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Exposure Monitor -->
+        <div class="section-container" id="exposure-section">
+            <div class="section-header" onclick="toggleSection('exposure-section')">
+                <div class="section-title">
+                    <span>💰</span>
+                    <span>Live Exposure Monitor</span>
+                </div>
+                <span class="collapse-icon">▼</span>
+            </div>
+            <div class="section-content">
+                <div class="filter-bar">
+                    <select id="account-filter" onchange="filterPositions()">
+                        <option value="all">All Accounts</option>
+                        <option value="ftmo">FTMO Challenge</option>
+                        <option value="topstep">TopStep Funded</option>
+                        <option value="personal">Personal Account</option>
+                    </select>
+                    <select id="portfolio-filter" onchange="filterPositions()">
+                        <option value="positions">Position Level</option>
+                        <option value="portfolio">Portfolio Level</option>
+                    </select>
+                    <span class="info-icon" data-tooltip="Position Level: Shows individual trades in detail | Portfolio Level: Shows aggregated summary by account with totals and averages">?</span>
+                </div>
+
+                <div class="exposure-grid">
+                    <div id="positions-container">
+                        <h4 style="margin-bottom: 16px; color: #e5e7eb;">Open Positions</h4>
+                        <table class="position-table" id="positions-table">
+                            <thead>
+                                <tr>
+                                    <th>Account</th>
+                                    <th>Symbol</th>
+                                    <th>Direction</th>
+                                    <th>Size</th>
+                                    <th>Entry</th>
+                                    <th>P&L</th>
+                                    <th>Risk %</th>
+                                </tr>
+                            </thead>
+                            <tbody id="positions-tbody">
+                                <tr data-account="ftmo">
+                                    <td style="font-size: 12px; color: #9ca3af;">FTMO</td>
+                                    <td style="font-weight: 600;">NQ</td>
+                                    <td class="positive">Long</td>
+                                    <td>2</td>
+                                    <td>17,245.50</td>
+                                    <td class="positive">+$380.00</td>
+                                    <td>0.5%</td>
+                                </tr>
+                                <tr data-account="ftmo">
+                                    <td style="font-size: 12px; color: #9ca3af;">FTMO</td>
+                                    <td style="font-weight: 600;">ES</td>
+                                    <td class="negative">Short</td>
+                                    <td>1</td>
+                                    <td>5,045.25</td>
+                                    <td class="positive">+$125.00</td>
+                                    <td>0.25%</td>
+                                </tr>
+                                <tr data-account="topstep">
+                                    <td style="font-size: 12px; color: #9ca3af;">TopStep</td>
+                                    <td style="font-weight: 600;">YM</td>
+                                    <td class="positive">Long</td>
+                                    <td>1</td>
+                                    <td>39,850.00</td>
+                                    <td class="negative">-$85.00</td>
+                                    <td>0.3%</td>
+                                </tr>
+                                <tr data-account="personal">
+                                    <td style="font-size: 12px; color: #9ca3af;">Personal</td>
+                                    <td style="font-weight: 600;">RTY</td>
+                                    <td class="negative">Short</td>
+                                    <td>2</td>
+                                    <td>2,245.50</td>
+                                    <td class="positive">+$210.00</td>
+                                    <td>0.4%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div style="margin-top: 16px; padding: 12px; background: rgba(55, 65, 81, 0.2); border-radius: 8px;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>Total P&L:</span>
+                                <span class="positive" style="font-weight: 600;" id="total-pnl">+$630.00</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-top: 8px;">
+                                <span>Total Risk:</span>
+                                <span style="font-weight: 600;" id="total-risk">$1,450 (1.45%)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 style="margin-bottom: 16px; color: #e5e7eb;">Correlation Analysis</h4>
+                        <div style="background: rgba(55, 65, 81, 0.2); padding: 16px; border-radius: 8px;">
+                            <div class="market-item">
+                                <span>NQ ↔ ES</span>
+                                <span class="warning">0.85 ⚠️</span>
+                            </div>
+                            <div class="market-item">
+                                <span>NQ ↔ YM</span>
+                                <span class="warning">0.72</span>
+                            </div>
+                            <div class="market-item">
+                                <span>ES ↔ RTY</span>
+                                <span class="positive">0.45</span>
+                            </div>
+                            <div class="market-item">
+                                <span>YM ↔ RTY</span>
+                                <span class="positive">0.38</span>
+                            </div>
+                        </div>
+                        <div style="margin-top: 16px; padding: 16px; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 8px;">
+                            <div style="font-weight: 600; margin-bottom: 8px;">⚠️ High Correlation Warning</div>
+                            <div style="font-size: 13px; color: #e5e7eb;">NQ and ES showing 0.85 correlation. Consider reducing exposure in correlated instruments.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Analytics -->
+        <div class="section-container" id="performance-section">
+            <div class="section-header" onclick="toggleSection('performance-section')">
+                <div class="section-title">
+                    <span>📊</span>
+                    <span>Performance Analytics</span>
+                </div>
+                <span class="collapse-icon">▼</span>
+            </div>
+            <div class="section-content">
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab(event, 'today')">Today</div>
+                    <div class="tab" onclick="switchTab(event, 'historical')">Historical</div>
+                </div>
+
+                <div id="today-tab" class="tab-content">
+                    <div class="performance-grid">
+                        <div class="metric-box">
+                            <div class="metric-label">Average Win</div>
+                            <div class="metric-value positive">$485 (0.48%)</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-label">Average Loss</div>
+                            <div class="metric-value negative">$210 (0.21%)</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-label">Largest Win</div>
+                            <div class="metric-value positive">$1,250</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-label">Largest Loss</div>
+                            <div class="metric-value negative">$580</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-label">Avg Hold Time</div>
+                            <div class="metric-value">47 min</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-label">Total Trades</div>
+                            <div class="metric-value">12</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="historical-tab" class="tab-content" style="display: none;">
+                    <div class="filter-bar">
+                        <div class="date-filter">
+                            <select id="date-range" onchange="handleDateRange()">
+                                <option value="7d">Last 7 Days</option>
+                                <option value="30d">Last 30 Days</option>
+                                <option value="90d">Last 90 Days</option>
+                                <option value="ytd">Year to Date</option>
+                                <option value="custom">Custom Range</option>
+                            </select>
+                            <input type="date" id="start-date" style="display: none;">
+                            <span id="date-separator" style="display: none;">to</span>
+                            <input type="date" id="end-date" style="display: none;">
+                            <button class="btn btn-primary btn-sm" id="apply-dates" style="display: none;" onclick="applyDateFilter()">Apply</button>
+                        </div>
+                    </div>
+                    <div class="performance-grid">
+                        <div class="metric-box">
+                            <div class="metric-label">Best Day</div>
+                            <div class="metric-value positive">+$3,250</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-label">Worst Day</div>
+                            <div class="metric-value negative">-$1,180</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-label">Current Streak</div>
+                            <div class="metric-value positive">5 wins</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-label">Expectancy</div>
+                            <div class="metric-value positive">$187/trade</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-label">Profit Factor</div>
+                            <div class="metric-value positive">2.18</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-label">Max Drawdown</div>
+                            <div class="metric-value negative">-8.2%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Market Conditions Panel -->
+        <div class="section-container" id="market-section">
+            <div class="section-header" onclick="toggleSection('market-section')">
+                <div class="section-title">
+                    <span>🌐</span>
+                    <span>Market Conditions</span>
+                </div>
+                <span class="collapse-icon">▼</span>
+            </div>
+            <div class="section-content">
+                <div class="market-grid">
+                    <div class="market-card">
+                        <h4>
+                            Market State
+                            <button class="btn btn-primary btn-sm" onclick="editMarkets()">Edit</button>
+                        </h4>
+                        <div id="market-list">
+                            <div class="market-item">
+                                <span>NQ</span>
+                                <span class="positive">↗ UPTREND</span>
+                            </div>
+                            <div class="market-item">
+                                <span>ES</span>
+                                <span class="warning">↗ RANGING</span>
+                            </div>
+                            <div class="market-item">
+                                <span>YM</span>
+                                <span class="positive">↗ UPTREND</span>
+                            </div>
+                            <div class="market-item">
+                                <span>RTY</span>
+                                <span class="negative">↘ DOWNTREND</span>
+                            </div>
+                            <div class="market-item">
+                                <span>GOLD</span>
+                                <span class="positive">↗ UPTREND</span>
+                            </div>
+                            <div class="market-item">
+                                <span>DAX</span>
+                                <span class="warning">↗ RANGING</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="market-card">
+                        <h4>Volatility</h4>
+                        <div class="market-item">
+                            <span>VIX</span>
+                            <span class="warning">18.5 ↗2.3%</span>
+                        </div>
+                        <div class="market-item">
+                            <span>ATR</span>
+                            <span class="warning">Expanding</span>
+                        </div>
+                        <div class="market-item">
+                            <span>IV Rank <span class="info-icon" data-tooltip="Implied Volatility Rank: Current IV compared to 52-week range (0-100)">?</span></span>
+                            <span>65%</span>
+                        </div>
+                        <div class="market-item">
+                            <span>Put/Call <span class="info-icon" data-tooltip="Put/Call Ratio: >1 = bearish sentiment, <1 = bullish sentiment">?</span></span>
+                            <span class="warning">1.15</span>
+                        </div>
+                    </div>
+
+                    <div class="market-card">
+                        <h4>News Calendar</h4>
+                        <div class="market-item">
+                            <span>🔴 FOMC</span>
+                            <span class="negative">in 2hr</span>
+                        </div>
+                        <div class="market-item">
+                            <span>🟡 CPI</span>
+                            <span class="warning">Tomorrow</span>
+                        </div>
+                        <div class="market-item">
+                            <span>🟢 Clear</span>
+                            <span class="positive">Next 4hr</span>
+                        </div>
+                        <div class="market-item">
+                            <span>📅 NFP</span>
+                            <span>Friday</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Account Compliance Center -->
+        <div class="section-container" id="compliance-section">
+            <div class="section-header" onclick="toggleSection('compliance-section')">
+                <div class="section-title">
+                    <span>✅</span>
+                    <span>Account Compliance Center</span>
+                </div>
+                <span class="collapse-icon">▼</span>
+            </div>
+            <div class="section-content">
+                <div class="account-tabs">
+                    <div class="tab active" onclick="switchAccountTab(event, 'prop-firms')">Prop Firms</div>
+                    <div class="tab" onclick="switchAccountTab(event, 'personal')">Personal Accounts</div>
+                </div>
+
+                <div id="prop-firms-tab" class="account-tab-content">
+                    <!-- FTMO Account -->
+                    <div class="account-card" id="ftmo-account">
+                        <div class="account-header" onclick="toggleAccount('ftmo-account')">
+                            <span>🏛️ FTMO ($100k Challenge)</span>
+                            <span class="positive">✅ COMPLIANT | Score: 98.5% <span class="collapse-icon" style="margin-left: 12px;">▼</span></span>
+                        </div>
+                        <div class="account-body">
+                            <div class="rule-section">
+                                <h4>▸ Compliance Rules</h4>
+                                <div class="rule-item">
+                                    <span class="rule-name">├─ Daily Loss:</span>
+                                    <span class="rule-value">$380/$2,500</span>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill progress-safe" style="width: 15.2%;"></div>
+                                    </div>
+                                    <span class="positive">15.2% ✅</span>
+                                </div>
+                                <div class="rule-item">
+                                    <span class="rule-name">├─ Max Loss:</span>
+                                    <span class="rule-value">$420/$5,000</span>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill progress-safe" style="width: 8.4%;"></div>
+                                    </div>
+                                    <span class="positive">8.4% ✅</span>
+                                </div>
+                                <div class="rule-item">
+                                    <span class="rule-name">├─ Profit Target:</span>
+                                    <span class="rule-value">$4,135/$5,000</span>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill progress-warning" style="width: 82.7%;"></div>
+                                    </div>
+                                    <span class="warning">82.7% 🎯</span>
+                                </div>
+                                <div class="rule-item">
+                                    <span class="rule-name">└─ Risk per Trade:</span>
+                                    <span class="rule-value"><span class="editable" contenteditable="true" data-account="ftmo">1.0%</span></span>
+                                    <span style="margin-left: auto;" class="positive">Max: 2%</span>
+                                </div>
+                            </div>
+
+                            <div class="rule-section">
+                                <h4>▸ Withdrawal Status</h4>
+                                <table class="mini-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Phase</th>
+                                            <th>Progress</th>
+                                            <th>Est. Payout</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Challenge</td>
+                                            <td>82.7% (3-5 days)</td>
+                                            <td>$3,000* <small>(*after funded)</small></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TopStep Account -->
+                    <div class="account-card" id="topstep-account">
+                        <div class="account-header" onclick="toggleAccount('topstep-account')">
+                            <span>🏛️ TopStep ($50k Funded)</span>
+                            <span class="positive">✅ FUNDED | Withdrawals YTD: 2 ($4,200) <span class="collapse-icon" style="margin-left: 12px;">▼</span></span>
+                        </div>
+                        <div class="account-body">
+                            <div class="rule-section">
+                                <h4>▸ Compliance Rules</h4>
+                                <div class="rule-item">
+                                    <span class="rule-name">├─ Daily Loss:</span>
+                                    <span class="rule-value">$0/$1,000</span>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill progress-safe" style="width: 0%;"></div>
+                                    </div>
+                                    <span class="positive">0.0% ✅</span>
+                                </div>
+                                <div class="rule-item">
+                                    <span class="rule-name">├─ Trailing Max:</span>
+                                    <span class="rule-value">$250/$2,000</span>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill progress-safe" style="width: 12.5%;"></div>
+                                    </div>
+                                    <span class="positive">12.5% ✅</span>
+                                </div>
+                                <div class="rule-item">
+                                    <span class="rule-name">├─ Monthly P&L:</span>
+                                    <span class="rule-value positive">+$2,050</span>
+                                    <span style="margin-left: auto;">📈</span>
+                                </div>
+                                <div class="rule-item">
+                                    <span class="rule-name">└─ Risk per Trade:</span>
+                                    <span class="rule-value"><span class="editable" contenteditable="true" data-account="topstep">0.8%</span></span>
+                                    <span style="margin-left: auto;" class="positive">Max: 2%</span>
+                                </div>
+                            </div>
+
+                            <div class="rule-section">
+                                <h4>▸ Withdrawal Status</h4>
+                                <table class="mini-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Eligible</th>
+                                            <th>Your Split</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>✅ YES</td>
+                                            <td>$1,640 (80% split)</td>
+                                            <td><button class="btn btn-success" style="padding: 4px 12px;" onclick="initiateWithdrawal('topstep', 1640)">Withdraw Now</button></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="personal-tab" class="account-tab-content" style="display: none;">
+                    <!-- Personal Account -->
+                    <div class="account-card" id="personal-account">
+                        <div class="account-header" onclick="toggleAccount('personal-account')">
+                            <span>💼 Tradeovate Personal ($45,000)</span>
+                            <span class="positive">🎯 ON TRACK | Risk Score: 94% <span class="collapse-icon" style="margin-left: 12px;">▼</span></span>
+                        </div>
+                        <div class="account-body">
+                            <div class="rule-section">
+                                <h4>▸ Personal Risk Limits</h4>
+                                <div class="rule-item" data-rule="daily-limit">
+                                    <span class="rule-name">├─ Daily Limit:</span>
+                                    <span class="rule-value">$<span id="daily-loss-current">750</span>/$<span class="editable" contenteditable="true" data-account="personal-daily" data-update="daily-limit">1000</span></span>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill progress-warning" style="width: 75%;" id="daily-limit-progress"></div>
+                                    </div>
+                                    <span class="warning" id="daily-limit-percent">75.0% ⚠️</span>
+                                </div>
+                                <div class="rule-item" data-rule="monthly-goal">
+                                    <span class="rule-name">├─ Monthly Goal:</span>
+                                    <span class="rule-value">$<span id="monthly-current">3,250</span>/$<span class="editable" contenteditable="true" data-account="personal-goal" data-update="monthly-goal">4000</span></span>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill progress-warning" style="width: 81.3%;" id="monthly-goal-progress"></div>
+                                    </div>
+                                    <span class="positive" id="monthly-goal-percent">81.3% 📈</span>
+                                </div>
+                                <div class="rule-item" data-rule="risk-per-trade">
+                                    <span class="rule-name">└─ Risk per Trade:</span>
+                                    <span class="rule-value"><span class="editable" contenteditable="true" data-account="personal-risk" data-update="risk-per-trade" data-is-percentage="true">0.8</span>%/<span class="editable" contenteditable="true" data-account="personal-max-risk" data-update="risk-per-trade-max" data-is-percentage="true">1.0</span>%</span>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill progress-safe" style="width: 80%;" id="risk-per-trade-progress"></div>
+                                    </div>
+                                    <span class="positive" id="risk-per-trade-status">Safe ✅</span>
+                                </div>
+                            </div>
+
+                            <div class="rule-section">
+                                <h4>▸ Withdrawal Plan (30% Profit Rule)</h4>
+                                <table class="mini-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Month P&L</th>
+                                            <th>Withdrawal</th>
+                                            <th>Schedule</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>+$3,250</td>
+                                            <td>$975 (30%)</td>
+                                            <td>Feb 1st (Auto-transfer)</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div style="margin-top: 12px; font-size: 13px; color: #9ca3af;">
+                                    Next Tier: $50k (+$5,975) → 40% withdrawal rate
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Risk Control Center -->
+        <div class="section-container" id="control-section">
+            <div class="section-header" onclick="toggleSection('control-section')">
+                <div class="section-title">
+                    <span>🎮</span>
+                    <span>Risk Control Center</span>
+                </div>
+                <span class="collapse-icon">▼</span>
+            </div>
+            <div class="section-content">
+                <div class="control-grid">
+                    <div class="control-section">
+                        <h4>Quick Actions</h4>
+                        <div class="control-buttons">
+                            <button class="btn btn-danger" id="emergency-btn">🚨 Emergency Stop</button>
+                            <button class="btn btn-warning" id="pause-btn">⏸️ Pause Trading</button>
+                            <button class="btn btn-primary" id="reduce-btn">📉 Reduce 50%</button>
+                            <button class="btn btn-success" id="close-all-btn">⌛ Close All</button>
+                        </div>
+                    </div>
+
+                    <div class="control-section">
+                        <h4>Exposure Control</h4>
+                        <div style="margin-bottom: 16px;">
+                            <div class="market-item">
+                                <span>Current:</span>
+                                <span class="warning" id="current-exposure">1.8%</span>
+                            </div>
+                            <div class="market-item">
+                                <span>Target:</span>
+                                <span id="target-exposure">2.0%</span>
+                            </div>
+                            <div class="market-item">
+                                <span>Auto-scale:</span>
+                                <span class="positive" id="auto-scale-status" style="cursor: pointer;">ON ✅</span>
+                            </div>
+                        </div>
+                        <div class="exposure-controls">
+                            <button class="btn btn-primary" id="decrease-exposure-btn" style="flex: 1;">
+                                <span>📉</span>
+                                <span>Decrease (-0.5%)</span>
+                            </button>
+                            <button class="btn btn-primary" id="increase-exposure-btn" style="flex: 1;">
+                                <span>📈</span>
+                                <span>Increase (+0.5%)</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="control-section">
+                        <h4>AI Management</h4>
+                        <div style="margin-bottom: 16px;">
+                            <div class="market-item">
+                                <span>Status:</span>
+                                <span class="positive" id="ai-status">ACTIVE ✅</span>
+                            </div>
+                            <div class="market-item">
+                                <span>Strategies:</span>
+                                <span id="active-strategies">3/3</span>
+                            </div>
+                            <div class="market-item">
+                                <span>Risk Mode:</span>
+                                <span id="risk-mode">Normal</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" id="ai-settings-btn" style="width: 100%;">⚙️ Settings</button>
+                    </div>
+                </div>
+
+                <!-- Emergency Restart Panel (Hidden by default) -->
+                <div id="restart-panel">
+                    <h3 style="color: #ef4444; margin-bottom: 12px;">🔒 SYSTEM LOCKED - Emergency Stop Active</h3>
+                    <p style="margin-bottom: 16px;">All trading has been halted. To resume operations, you must manually restart the system.</p>
+                    <button class="btn btn-restart" id="restart-btn" style="width: 100%;">
+                        🔄 MANUAL RESTART SYSTEM
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Withdrawal Strategy Planner -->
+        <div class="section-container" id="withdrawal-section">
+            <div class="section-header" onclick="toggleSection('withdrawal-section')">
+                <div class="section-title">
+                    <span>💰</span>
+                    <span>Withdrawal Strategy Planner</span>
+                </div>
+                <span class="collapse-icon">▼</span>
+            </div>
+            <div class="section-content">
+                <div class="milestone-list">
+                    <h4 style="margin-bottom: 16px;">Account Growth Milestones</h4>
+                    <div class="milestone-item">
+                        <span>├─ $25k-50k:</span>
+                        <span style="margin-left: auto;">Withdraw 20% monthly profit</span>
+                    </div>
+                    <div class="milestone-item active">
+                        <span>├─ $50k-100k:</span>
+                        <span style="margin-left: auto;">Withdraw 30% monthly profit ← YOU ARE HERE</span>
+                    </div>
+                    <div class="milestone-item">
+                        <span>├─ $100k-250k:</span>
+                        <span style="margin-left: auto;">Withdraw 40% monthly profit</span>
+                    </div>
+                    <div class="milestone-item">
+                        <span>└─ $250k+:</span>
+                        <span style="margin-left: auto;">Withdraw 50% monthly profit</span>
+                    </div>
+                </div>
+
+                <div class="withdrawal-summary">
+                    <div class="withdrawal-card">
+                        <div class="metric-label">This Month's Profit</div>
+                        <div class="metric-value positive">$12,450</div>
+                    </div>
+                    <div class="withdrawal-card">
+                        <div class="metric-label">Suggested Withdrawal</div>
+                        <div class="metric-value">$3,735 (30%)</div>
+                    </div>
+                    <div class="withdrawal-card">
+                        <div class="metric-label">Next Withdrawal</div>
+                        <div class="metric-value">Feb 1st</div>
+                    </div>
+                    <div class="withdrawal-card">
+                        <div class="metric-label">Total Withdrawn YTD</div>
+                        <div class="metric-value positive">$18,250</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Risk Alerts -->
+        <div class="section-container" id="alerts-section">
+            <div class="section-header" onclick="toggleSection('alerts-section')">
+                <div class="section-title">
+                    <span>🚨</span>
+                    <span>Risk Alerts & Notifications</span>
+                </div>
+                <span class="collapse-icon">▼</span>
+            </div>
+            <div class="section-content">
+                <div class="alert-list" id="alert-list">
+                    <div class="alert-item alert-high" onclick="handleAlertClick(this)">
+                        <span class="alert-icon">🔴</span>
+                        <div class="alert-content">
+                            <div style="font-weight: 600;">Approaching daily loss limit (85% used)</div>
+                            <div style="font-size: 12px;">FTMO account has used $2,125 of $2,500 daily limit</div>
+                            <div class="alert-time">2 minutes ago</div>
+                        </div>
+                    </div>
+                    <div class="alert-item alert-medium" onclick="handleAlertClick(this)">
+                        <span class="alert-icon">🟡</span>
+                        <div class="alert-content">
+                            <div style="font-weight: 600;">High correlation detected between positions</div>
+                            <div style="font-size: 12px;">NQ and ES showing 0.85 correlation coefficient</div>
+                            <div class="alert-time">15 minutes ago</div>
+                        </div>
+                    </div>
+                    <div class="alert-item alert-low" onclick="handleAlertClick(this)">
+                        <span class="alert-icon">🟢</span>
+                        <div class="alert-content">
+                            <div style="font-weight: 600;">News event in 30 minutes</div>
+                            <div style="font-size: 12px;">FOMC Minutes release - volatility expected</div>
+                            <div class="alert-time">Just now</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div class="modal" id="export-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📊 Generate Risk Report</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            
+            <div class="export-options">
+                <div class="export-option selected" id="daily-option" onclick="selectExportOption(this, 'daily')" data-format="daily">
+                    <span>📅</span>
+                    <div>
+                        <div style="font-weight: 600;">Daily Risk Summary</div>
+                        <div style="font-size: 12px; color: #9ca3af;">Today's risk metrics and positions</div>
+                    </div>
+                </div>
+                <div class="export-option" id="weekly-option" onclick="selectExportOption(this, 'weekly')" data-format="weekly">
+                    <span>📊</span>
+                    <div>
+                        <div style="font-weight: 600;">Weekly Risk Analysis</div>
+                        <div style="font-size: 12px; color: #9ca3af;">7-day comprehensive risk report</div>
+                    </div>
+                </div>
+                <div class="export-option" id="monthly-option" onclick="selectExportOption(this, 'monthly')" data-format="monthly">
+                    <span>📈</span>
+                    <div>
+                        <div style="font-weight: 600;">Monthly Compliance Report</div>
+                        <div style="font-size: 12px; color: #9ca3af;">Full month risk and compliance analysis</div>
+                    </div>
+                </div>
+                <div class="export-option" id="custom-option" onclick="selectExportOption(this, 'custom')" data-format="custom">
+                    <span>⚙️</span>
+                    <div>
+                        <div style="font-weight: 600;">Custom Date Range</div>
+                        <div style="font-size: 12px; color: #9ca3af;">Select specific dates for analysis</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Custom Date Section -->
+            <div id="custom-date-section" style="display: none; margin-bottom: 20px;">
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <div style="flex: 1;">
+                        <label style="display: block; margin-bottom: 4px; font-size: 12px; color: #9ca3af;">Start Date</label>
+                        <input type="date" id="modal-start-date" style="width: 100%;">
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="display: block; margin-bottom: 4px; font-size: 12px; color: #9ca3af;">End Date</label>
+                        <input type="date" id="modal-end-date" style="width: 100%;">
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-size: 14px;">Format:</label>
+                <div style="display: flex; gap: 12px;">
+                    <label style="flex: 1; display: flex; align-items: center; gap: 8px; padding: 12px; background: rgba(55, 65, 81, 0.2); border: 1px solid #374151; border-radius: 8px; cursor: pointer;">
+                        <input type="radio" name="format" value="pdf" checked>
+                        <span>PDF Document</span>
+                    </label>
+                    <label style="flex: 1; display: flex; align-items: center; gap: 8px; padding: 12px; background: rgba(55, 65, 81, 0.2); border: 1px solid #374151; border-radius: 8px; cursor: pointer;">
+                        <input type="radio" name="format" value="excel">
+                        <span>Excel Spreadsheet</span>
+                    </label>
+                    <label style="flex: 1; display: flex; align-items: center; gap: 8px; padding: 12px; background: rgba(55, 65, 81, 0.2); border: 1px solid #374151; border-radius: 8px; cursor: pointer;">
+                        <input type="radio" name="format" value="json">
+                        <span>JSON Data</span>
+                    </label>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 12px;">
+                <button class="btn btn-primary" style="flex: 1;" onclick="generateReport()">Generate Report</button>
+                <button class="btn" style="flex: 1; background: rgba(55, 65, 81, 0.5); color: #e5e7eb;" onclick="closeModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Modal for Quick Actions -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-simple">
+            <div class="modal-simple-header" id="modalHeader">Title</div>
+            <div class="modal-simple-body" id="modalBody">Body</div>
+            <div class="modal-actions" id="modalActions">
+                <button class="modal-btn modal-btn-cancel" onclick="closeCustomModal()">Cancel</button>
+                <button class="modal-btn modal-btn-confirm" id="modalConfirmBtn">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State management
+        let isPaused = false;
+        let isEmergencyStopped = false;
+        let positions = [
+            { account: 'ftmo', symbol: 'NQ', direction: 'Long', size: 2, entry: 17245.50, pnl: 380.00, risk: 0.5 },
+            { account: 'ftmo', symbol: 'ES', direction: 'Short', size: 1, entry: 5045.25, pnl: 125.00, risk: 0.25 },
+            { account: 'topstep', symbol: 'YM', direction: 'Long', size: 1, entry: 39850.00, pnl: -85.00, risk: 0.3 },
+            { account: 'personal', symbol: 'RTY', direction: 'Short', size: 2, entry: 2245.50, pnl: 210.00, risk: 0.4 }
+        ];
+        let selectedReportType = 'daily';
+
+        // Custom modal functions
+        function showCustomModal(title, body, onConfirm, confirmText = 'Confirm', confirmClass = 'modal-btn-confirm', showCancel = true) {
+            const modal = document.getElementById('modalOverlay');
+            const header = document.getElementById('modalHeader');
+            const bodyEl = document.getElementById('modalBody');
+            const confirmBtn = document.getElementById('modalConfirmBtn');
+            const actionsEl = document.getElementById('modalActions');
+            
+            header.innerHTML = title;
+            bodyEl.innerHTML = body;
+            confirmBtn.textContent = confirmText;
+            confirmBtn.className = `modal-btn ${confirmClass}`;
+            
+            // Handle cancel button visibility
+            const cancelBtn = actionsEl.querySelector('.modal-btn-cancel');
+            if (cancelBtn) {
+                cancelBtn.style.display = showCancel ? 'block' : 'none';
+            }
+            
+            // Remove old listener and add new one
+            const newConfirmBtn = confirmBtn.cloneNode(true);
+            confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+            
+            newConfirmBtn.addEventListener('click', () => {
+                closeCustomModal();
+                if (onConfirm) onConfirm();
+            });
+            
+            modal.classList.add('show');
+        }
+
+        function closeCustomModal() {
+            document.getElementById('modalOverlay').classList.remove('show');
+        }
+
+        function showNotification(title, message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = `
+                <div class="notification-title">${title}</div>
+                <div>${message}</div>
+            `;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 4000);
+        }
+
+        // Toggle section collapse
+        function toggleSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            section.classList.toggle('collapsed');
+        }
+
+        // Toggle account collapse
+        function toggleAccount(accountId) {
+            const account = document.getElementById(accountId);
+            account.classList.toggle('collapsed');
+        }
+
+        // Switch tabs
+        function switchTab(event, tabName) {
+            const tabs = event.target.parentElement.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+
+            const tabContents = event.target.parentElement.parentElement.querySelectorAll('.tab-content');
+            tabContents.forEach(content => content.style.display = 'none');
+            
+            if (tabName === 'today') {
+                document.getElementById('today-tab').style.display = 'block';
+            } else {
+                document.getElementById('historical-tab').style.display = 'block';
+            }
+        }
+
+        // Switch account tabs
+        function switchAccountTab(event, tabName) {
+            const tabs = event.target.parentElement.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+
+            if (tabName === 'prop-firms') {
+                document.getElementById('prop-firms-tab').style.display = 'block';
+                document.getElementById('personal-tab').style.display = 'none';
+            } else {
+                document.getElementById('prop-firms-tab').style.display = 'none';
+                document.getElementById('personal-tab').style.display = 'block';
+            }
+        }
+
+        // Filter positions function
+        function filterPositions() {
+            const accountFilter = document.getElementById('account-filter').value;
+            const portfolioFilter = document.getElementById('portfolio-filter').value;
+            
+            const positionsContainer = document.getElementById('positions-container');
+            if (!positionsContainer) {
+                console.error('Positions container not found');
+                return;
+            }
+            
+            if (portfolioFilter === 'portfolio') {
+                // Portfolio Level View - Show aggregated data
+                const aggregated = {};
+                positions.forEach(pos => {
+                    if (accountFilter === 'all' || pos.account === accountFilter) {
+                        if (!aggregated[pos.account]) {
+                            aggregated[pos.account] = {
+                                positions: 0,
+                                totalPnl: 0,
+                                totalRisk: 0,
+                                symbols: []
+                            };
+                        }
+                        aggregated[pos.account].positions++;
+                        aggregated[pos.account].totalPnl += pos.pnl;
+                        aggregated[pos.account].totalRisk += pos.risk;
+                        aggregated[pos.account].symbols.push(pos.symbol);
+                    }
+                });
+
+                let portfolioHTML = `
+                    <h4 style="margin-bottom: 16px; color: #e5e7eb;">Portfolio Summary</h4>
+                    <div style="display: grid; gap: 12px;">
+                `;
+                
+                for (const [account, data] of Object.entries(aggregated)) {
+                    const pnlClass = data.totalPnl >= 0 ? 'positive' : 'negative';
+                    portfolioHTML += `
+                        <div style="background: rgba(55, 65, 81, 0.2); padding: 16px; border-radius: 8px; border-left: 3px solid #667eea;">
+                            <h4 style="text-transform: uppercase; color: #667eea; margin-bottom: 12px;">${account}</h4>
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font-size: 14px;">
+                                <div><strong>Positions:</strong> ${data.positions}</div>
+                                <div><strong>Symbols:</strong> ${data.symbols.join(', ')}</div>
+                                <div><strong>Total P&L:</strong> <span class="${pnlClass}">${data.totalPnl >= 0 ? '+' : ''}${data.totalPnl.toFixed(2)}</span></div>
+                                <div><strong>Total Risk:</strong> ${data.totalRisk.toFixed(2)}%</div>
+                                <div><strong>Avg Risk/Trade:</strong> ${(data.totalRisk / data.positions).toFixed(2)}%</div>
+                                <div><strong>Avg P&L/Trade:</strong> ${(data.totalPnl / data.positions).toFixed(2)}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                portfolioHTML += '</div>';
+                positionsContainer.innerHTML = portfolioHTML;
+                
+            } else {
+                // Position Level View - Show individual positions
+                const originalTableHTML = `
+                    <h4 style="margin-bottom: 16px; color: #e5e7eb;">Open Positions</h4>
+                    <table class="position-table" id="positions-table">
+                        <thead>
+                            <tr>
+                                <th>Account</th>
+                                <th>Symbol</th>
+                                <th>Direction</th>
+                                <th>Size</th>
+                                <th>Entry</th>
+                                <th>P&L</th>
+                                <th>Risk %</th>
+                            </tr>
+                        </thead>
+                        <tbody id="positions-tbody"></tbody>
+                    </table>
+                    <div style="margin-top: 16px; padding: 12px; background: rgba(55, 65, 81, 0.2); border-radius: 8px;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>Total P&L:</span>
+                            <span class="positive" style="font-weight: 600;" id="total-pnl">+$630.00</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-top: 8px;">
+                            <span>Total Risk:</span>
+                            <span style="font-weight: 600;" id="total-risk">$1,450 (1.45%)</span>
+                        </div>
+                    </div>
+                `;
+                
+                positionsContainer.innerHTML = originalTableHTML;
+                
+                const tbody = document.getElementById('positions-tbody');
+                if (tbody) {
+                    tbody.innerHTML = '';
+                    
+                    positions.forEach(pos => {
+                        if (accountFilter === 'all' || pos.account === accountFilter) {
+                            const row = tbody.insertRow();
+                            row.dataset.account = pos.account;
+                            row.innerHTML = `
+                                <td style="font-size: 12px; color: #9ca3af;">${pos.account.toUpperCase()}</td>
+                                <td style="font-weight: 600;">${pos.symbol}</td>
+                                <td class="${pos.direction === 'Long' ? 'positive' : 'negative'}">${pos.direction}</td>
+                                <td>${pos.size}</td>
+                                <td>${pos.entry.toFixed(2)}</td>
+                                <td class="${pos.pnl >= 0 ? 'positive' : 'negative'}">${pos.pnl >= 0 ? '+' : ''}$${Math.abs(pos.pnl).toFixed(2)}</td>
+                                <td>${pos.risk}%</td>
+                            `;
+                        }
+                    });
+                    
+                    updateTotals();
+                }
+            }
+        }
+
+        // Update totals
+        function updateTotals() {
+            const totalPnlElement = document.getElementById('total-pnl');
+            const totalRiskElement = document.getElementById('total-risk');
+            
+            if (!totalPnlElement || !totalRiskElement) return;
+            
+            const tbody = document.getElementById('positions-tbody');
+            if (!tbody) return;
+            
+            const rows = tbody.querySelectorAll('tr[data-account]');
+            let totalPnl = 0;
+            let totalRisk = 0;
+            
+            rows.forEach(row => {
+                if (row.style.display !== 'none' && row.cells.length > 1) {
+                    const pnlText = row.cells[5].textContent.replace(/[+$,]/g, '');
+                    const pnl = parseFloat(pnlText);
+                    const risk = parseFloat(row.cells[6].textContent.replace('%', ''));
+                    
+                    if (!isNaN(pnl)) totalPnl += pnl;
+                    if (!isNaN(risk)) totalRisk += risk;
+                }
+            });
+            
+            totalPnlElement.textContent = totalPnl >= 0 ? `+$${totalPnl.toFixed(2)}` : `-$${Math.abs(totalPnl).toFixed(2)}`;
+            totalPnlElement.className = totalPnl >= 0 ? 'positive' : 'negative';
+            totalRiskElement.textContent = `$${(totalRisk * 1000).toFixed(0)} (${totalRisk.toFixed(2)}%)`;
+        }
+
+        // Handle date range selection
+        function handleDateRange() {
+            const range = document.getElementById('date-range').value;
+            const startDate = document.getElementById('start-date');
+            const endDate = document.getElementById('end-date');
+            const separator = document.getElementById('date-separator');
+            const applyBtn = document.getElementById('apply-dates');
+
+            if (range === 'custom') {
+                startDate.style.display = 'inline-block';
+                endDate.style.display = 'inline-block';
+                separator.style.display = 'inline';
+                applyBtn.style.display = 'inline-block';
+                
+                const today = new Date();
+                const lastMonth = new Date(today);
+                lastMonth.setMonth(today.getMonth() - 1);
+                
+                startDate.value = lastMonth.toISOString().split('T')[0];
+                endDate.value = today.toISOString().split('T')[0];
+            } else {
+                startDate.style.display = 'none';
+                endDate.style.display = 'none';
+                separator.style.display = 'none';
+                applyBtn.style.display = 'none';
+                applyDateFilter();
+            }
+        }
+
+        function applyDateFilter() {
+            const range = document.getElementById('date-range').value;
+            const rangeText = document.getElementById('date-range').selectedOptions[0].text;
+            
+            const metrics = document.querySelectorAll('#historical-tab .metric-value');
+            
+            let multiplier = 1;
+            let dayCount = 7;
+            
+            switch(range) {
+                case '7d':
+                    multiplier = 0.5;
+                    dayCount = 7;
+                    break;
+                case '30d':
+                    multiplier = 1;
+                    dayCount = 30;
+                    break;
+                case '90d':
+                    multiplier = 2.5;
+                    dayCount = 90;
+                    break;
+                case 'ytd':
+                    multiplier = 3.8;
+                    dayCount = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 1)) / (1000 * 60 * 60 * 24));
+                    break;
+                case 'custom':
+                    const start = new Date(document.getElementById('start-date').value);
+                    const end = new Date(document.getElementById('end-date').value);
+                    dayCount = Math.floor((end - start) / (1000 * 60 * 60 * 24));
+                    multiplier = dayCount / 30;
+                    break;
+            }
+            
+            // Update metrics
+            metrics[0].textContent = `+$${(3250 * multiplier).toFixed(0)}`;
+            metrics[0].className = 'metric-value positive';
+            
+            metrics[1].textContent = `-$${(1180 * multiplier * 0.8).toFixed(0)}`;
+            metrics[1].className = 'metric-value negative';
+            
+            const streakCount = Math.min(Math.floor(5 + Math.random() * dayCount/10), dayCount);
+            metrics[2].textContent = `${streakCount} wins`;
+            metrics[2].className = 'metric-value positive';
+            
+            const expectancy = 187 + (multiplier * 23);
+            metrics[3].textContent = `$${expectancy.toFixed(0)}/trade`;
+            metrics[3].className = 'metric-value positive';
+            
+            const profitFactor = (2.18 + (multiplier * 0.1)).toFixed(2);
+            metrics[4].textContent = profitFactor;
+            metrics[4].className = 'metric-value positive';
+            
+            const drawdown = (8.2 + (multiplier * 1.5)).toFixed(1);
+            metrics[5].textContent = `-${drawdown}%`;
+            metrics[5].className = 'metric-value negative';
+            
+            showNotification('Date Filter Applied', `Loading ${rangeText} data (${dayCount} days)`, 'success');
+        }
+
+        // Edit markets
+        function editMarkets() {
+            const marketList = document.getElementById('market-list');
+            const currentMarkets = Array.from(marketList.querySelectorAll('.market-item'))
+                .map(item => ({
+                    symbol: item.querySelector('span:first-child').textContent,
+                    trend: item.querySelector('span:last-child').textContent.trim()
+                }));
+
+            const modalHTML = `
+                <div class="modal" id="market-edit-modal" style="display: block;">
+                    <div class="modal-content" style="max-width: 600px;">
+                        <div class="modal-header">
+                            <h2>📊 Edit Markets</h2>
+                            <button class="modal-close" onclick="closeMarketModal()">&times;</button>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="margin-bottom: 12px;">Current Markets:</h4>
+                            <div id="editable-markets" style="background: rgba(55, 65, 81, 0.2); padding: 16px; border-radius: 8px; max-height: 300px; overflow-y: auto;">
+                                ${currentMarkets.map((market, index) => `
+                                    <div class="market-edit-item" id="market-item-${index}" style="display: flex; align-items: center; margin-bottom: 8px;">
+                                        <input type="text" value="${market.symbol}" style="flex: 1; margin-right: 8px; padding: 8px; background: rgba(55, 65, 81, 0.3); border: 1px solid #374151; border-radius: 6px; color: #e5e7eb;" id="market-${index}">
+                                        <select style="flex: 1; margin-right: 8px; padding: 8px; background: rgba(55, 65, 81, 0.3); border: 1px solid #374151; border-radius: 6px; color: #e5e7eb;" id="trend-${index}">
+                                            <option value="up" ${market.trend.includes('UPTREND') ? 'selected' : ''}>↗ UPTREND</option>
+                                            <option value="down" ${market.trend.includes('DOWNTREND') ? 'selected' : ''}>↘ DOWNTREND</option>
+                                            <option value="range" ${market.trend.includes('RANGING') ? 'selected' : ''}>↗ RANGING</option>
+                                        </select>
+                                        <button class="btn btn-danger btn-sm" onclick="removeMarket(${index})">Remove</button>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="margin-bottom: 12px;">Add New Market:</h4>
+                            <div style="display: flex; gap: 8px;">
+                                <input type="text" id="new-market-symbol" placeholder="Symbol (e.g., CL, EUR/USD)" style="flex: 1; padding: 8px; background: rgba(55, 65, 81, 0.3); border: 1px solid #374151; border-radius: 6px; color: #e5e7eb;">
+                                <select id="new-market-trend" style="flex: 1; padding: 8px; background: rgba(55, 65, 81, 0.3); border: 1px solid #374151; border-radius: 6px; color: #e5e7eb;">
+                                    <option value="up">↗ UPTREND</option>
+                                    <option value="down">↘ DOWNTREND</option>
+                                    <option value="range">↗ RANGING</option>
+                                </select>
+                                <button class="btn btn-success" onclick="addNewMarket()">Add</button>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 12px;">
+                            <button class="btn btn-primary" style="flex: 1;" onclick="saveMarkets()">Save Changes</button>
+                            <button class="btn" style="flex: 1; background: rgba(55, 65, 81, 0.5); color: #e5e7eb;" onclick="closeMarketModal()">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = modalHTML;
+            document.body.appendChild(tempDiv.firstElementChild);
+        }
+
+        window.closeMarketModal = function() {
+            const modal = document.getElementById('market-edit-modal');
+            if (modal) modal.remove();
+        }
+
+        window.removeMarket = function(index) {
+            const item = document.getElementById(`market-item-${index}`);
+            if (item) {
+                item.style.opacity = '0';
+                item.style.transform = 'translateX(-100%)';
+                setTimeout(() => item.remove(), 300);
+            }
+        }
+
+        window.addNewMarket = function() {
+            const symbol = document.getElementById('new-market-symbol').value.trim();
+            const trend = document.getElementById('new-market-trend').value;
+            
+            if (!symbol) {
+                showNotification('Error', 'Please enter a market symbol', 'danger');
+                return;
+            }
+            
+            const container = document.getElementById('editable-markets');
+            const index = container.querySelectorAll('.market-edit-item').length;
+            
+            const newItemHTML = `
+                <div class="market-edit-item" id="market-item-${index}" style="display: flex; align-items: center; margin-bottom: 8px;">
+                    <input type="text" value="${symbol}" style="flex: 1; margin-right: 8px; padding: 8px; background: rgba(55, 65, 81, 0.3); border: 1px solid #374151; border-radius: 6px; color: #e5e7eb;" id="market-${index}">
+                    <select style="flex: 1; margin-right: 8px; padding: 8px; background: rgba(55, 65, 81, 0.3); border: 1px solid #374151; border-radius: 6px; color: #e5e7eb;" id="trend-${index}">
+                        <option value="up" ${trend === 'up' ? 'selected' : ''}>↗ UPTREND</option>
+                        <option value="down" ${trend === 'down' ? 'selected' : ''}>↘ DOWNTREND</option>
+                        <option value="range" ${trend === 'range' ? 'selected' : ''}>↗ RANGING</option>
+                    </select>
+                    <button class="btn btn-danger btn-sm" onclick="removeMarket(${index})">Remove</button>
+                </div>
+            `;
+            
+            container.insertAdjacentHTML('beforeend', newItemHTML);
+            document.getElementById('new-market-symbol').value = '';
+        }
+
+        window.saveMarkets = function() {
+            const marketList = document.getElementById('market-list');
+            const items = document.querySelectorAll('.market-edit-item');
+            
+            marketList.innerHTML = '';
+            
+            items.forEach((item) => {
+                const symbolInput = item.querySelector('input[type="text"]');
+                const trendSelect = item.querySelector('select');
+                
+                if (symbolInput && trendSelect) {
+                    const symbol = symbolInput.value;
+                    const trend = trendSelect.value;
+                    const trendClass = trend === 'up' ? 'positive' : trend === 'down' ? 'negative' : 'warning';
+                    const trendText = trend === 'up' ? '↗ UPTREND' : trend === 'down' ? '↘ DOWNTREND' : '↗ RANGING';
+                    
+                    marketList.innerHTML += `
+                        <div class="market-item">
+                            <span>${symbol}</span>
+                            <span class="${trendClass}">${trendText}</span>
+                        </div>
+                    `;
+                }
+            });
+            
+            closeMarketModal();
+            showNotification('Markets Updated', 'Market watchlist has been updated successfully', 'success');
+        }
+
+        // Risk Report Modal
+        function showRiskReportModal() {
+            document.getElementById('export-modal').style.display = 'block';
+            
+            document.querySelectorAll('.export-option').forEach(opt => opt.classList.remove('selected'));
+            document.getElementById('daily-option').classList.add('selected');
+            selectedReportType = 'daily';
+            
+            document.getElementById('custom-date-section').style.display = 'none';
+        }
+
+        function closeModal() {
+            document.getElementById('export-modal').style.display = 'none';
+        }
+
+        // Export option selection
+        function selectExportOption(element, type) {
+            document.querySelectorAll('.export-option').forEach(opt => opt.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedReportType = type;
+            
+            const customDateSection = document.getElementById('custom-date-section');
+            if (type === 'custom') {
+                customDateSection.style.display = 'block';
+            } else {
+                customDateSection.style.display = 'none';
+            }
+        }
+
+        function generateReport() {
+            const format = document.querySelector('input[name="format"]:checked').value;
+            showNotification('Report Generated', `${selectedReportType} risk report exported as ${format.toUpperCase()}`, 'success');
+            closeModal();
+        }
+
+        // EMERGENCY STOP Function
+        function emergencyStop() {
+            if (isEmergencyStopped) {
+                showNotification('Already Stopped', 'System is already in emergency stop mode', 'warning');
+                return;
+            }
+
+            showCustomModal(
+                '🚨 EMERGENCY STOP - ARE YOU SURE?',
+                `<strong style="color: #ef4444;">⚠️ CRITICAL ACTION ⚠️</strong><br><br>
+                This will IMMEDIATELY:<br><br>
+                ⛔ HALT all trading operations<br>
+                ⛔ CLOSE all open positions at market<br>
+                ⛔ CANCEL all pending orders<br>
+                ⛔ DISABLE all strategies<br>
+                ⛔ LOCK the trading system<br><br>
+                <strong>Manual restart will be required!</strong>`,
+                () => {
+                    executeEmergencyStop();
+                },
+                'EXECUTE EMERGENCY STOP',
+                'modal-btn-confirm'
+            );
+        }
+
+        function executeEmergencyStop() {
+            isEmergencyStopped = true;
+            
+            const tbody = document.getElementById('positions-tbody');
+            if (tbody) {
+                const rows = tbody.querySelectorAll('tr');
+                
+                rows.forEach((row, index) => {
+                    setTimeout(() => {
+                        row.style.transition = 'all 0.3s ease';
+                        row.style.background = 'rgba(239, 68, 68, 0.2)';
+                        row.style.transform = 'translateX(100%)';
+                        row.style.opacity = '0';
+                        setTimeout(() => row.remove(), 300);
+                    }, index * 100);
+                });
+                
+                setTimeout(() => {
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #9ca3af;">No open positions</td></tr>';
+                }, rows.length * 100 + 300);
+            }
+            
+            setTimeout(() => {
+                document.getElementById('status-text').textContent = 'EMERGENCY STOP 🔒';
+                document.getElementById('status-text').className = 'status-locked';
+                
+                document.getElementById('ai-status').textContent = 'LOCKED 🔒';
+                document.getElementById('ai-status').className = 'negative';
+                document.getElementById('active-strategies').textContent = '0/3';
+                document.getElementById('current-exposure').textContent = '0.0%';
+                document.getElementById('current-exposure-card').textContent = '0.0%';
+                
+                positions = [];
+                
+                document.getElementById('pause-btn').disabled = true;
+                document.getElementById('reduce-btn').disabled = true;
+                document.getElementById('close-all-btn').disabled = true;
+                document.getElementById('decrease-exposure-btn').disabled = true;
+                document.getElementById('increase-exposure-btn').disabled = true;
+                document.getElementById('ai-settings-btn').disabled = true;
+                
+                document.querySelectorAll('.control-section').forEach(section => {
+                    if (!section.contains(document.getElementById('emergency-btn'))) {
+                        section.classList.add('emergency-locked');
+                    }
+                });
+                
+                document.getElementById('restart-panel').style.display = 'block';
+                
+                showNotification('🚨 Emergency Stop Executed', 'System halted. Manual restart required.', 'danger');
+            }, 300);
+        }
+
+        // MANUAL RESTART Function
+        function manualRestart() {
+            showCustomModal(
+                '🔄 Manual System Restart',
+                `<strong>Pre-Restart Checklist:</strong><br><br>
+                ✓ Review what caused the emergency stop<br>
+                ✓ Verify market conditions are stable<br>
+                ✓ Check account balances and margins<br>
+                ✓ Confirm risk parameters are correct<br><br>
+                <strong>This will:</strong><br>
+                • Reset all systems to default state<br>
+                • Re-enable all trading functions<br>
+                • Restart strategy monitoring<br>
+                • Clear all emergency locks<br><br>
+                <strong style="color: #10b981;">Ready to restart the system?</strong>`,
+                () => {
+                    executeRestart();
+                },
+                'RESTART SYSTEM',
+                'modal-btn-restart'
+            );
+        }
+
+        function executeRestart() {
+            const restartBtn = document.getElementById('restart-btn');
+            restartBtn.innerHTML = '<span class="spinner"></span> Restarting System...';
+            restartBtn.disabled = true;
+            
+            setTimeout(() => {
+                isEmergencyStopped = false;
+                isPaused = false;
+                
+                document.getElementById('status-text').textContent = 'OPERATIONAL ✅';
+                document.getElementById('status-text').className = 'status-operational';
+                
+                document.getElementById('ai-status').textContent = 'ACTIVE ✅';
+                document.getElementById('ai-status').className = 'positive';
+                document.getElementById('active-strategies').textContent = '3/3';
+                
+                document.getElementById('emergency-btn').disabled = false;
+                document.getElementById('pause-btn').disabled = false;
+                document.getElementById('reduce-btn').disabled = false;
+                document.getElementById('close-all-btn').disabled = false;
+                document.getElementById('decrease-exposure-btn').disabled = false;
+                document.getElementById('increase-exposure-btn').disabled = false;
+                document.getElementById('ai-settings-btn').disabled = false;
+                
+                const pauseBtn = document.getElementById('pause-btn');
+                pauseBtn.innerHTML = '⏸️ Pause Trading';
+                pauseBtn.classList.remove('btn-success');
+                pauseBtn.classList.add('btn-warning');
+                
+                document.querySelectorAll('.control-section').forEach(section => {
+                    section.classList.remove('emergency-locked');
+                });
+                
+                document.getElementById('restart-panel').style.display = 'none';
+                restartBtn.innerHTML = '🔄 MANUAL RESTART SYSTEM';
+                restartBtn.disabled = false;
+                
+                showNotification('✅ System Restarted', 'All systems are now operational. Trading can resume.', 'success');
+            }, 2000);
+        }
+
+        // PAUSE TRADING Function
+        function pauseTrading() {
+            if (isEmergencyStopped) {
+                showNotification('System Locked', 'Cannot pause - system is in emergency stop mode', 'warning');
+                return;
+            }
+
+            if (isPaused) {
+                resumeTrading();
+                return;
+            }
+
+            showCustomModal(
+                '⏸️ Pause All Trading?',
+                `This will:<br><br>
+                ⌛ Stop ALL strategy monitoring<br>
+                ⌛ Disable ALL automatic trading<br>
+                ⌛ Pause signal generation<br>
+                ✅ Keep existing positions open<br>
+                ✅ Maintain stop losses and targets<br><br>
+                All strategies can be reactivated instantly.`,
+                () => {
+                    isPaused = true;
+                    const pauseBtn = document.getElementById('pause-btn');
+                    pauseBtn.innerHTML = '▶️ Resume Trading';
+                    pauseBtn.classList.remove('btn-warning');
+                    pauseBtn.classList.add('btn-success');
+                    
+                    document.getElementById('ai-status').textContent = 'PAUSED ⏸️';
+                    document.getElementById('ai-status').className = 'warning';
+                    document.getElementById('active-strategies').textContent = '0/3';
+                    
+                    showNotification('⏸️ Trading Paused', 'All strategies paused. Click Resume to reactivate.', 'warning');
+                }
+            );
+        }
+
+        function resumeTrading() {
+            isPaused = false;
+            const pauseBtn = document.getElementById('pause-btn');
+            pauseBtn.innerHTML = '⏸️ Pause Trading';
+            pauseBtn.classList.remove('btn-success');
+            pauseBtn.classList.add('btn-warning');
+            
+            document.getElementById('ai-status').textContent = 'ACTIVE ✅';
+            document.getElementById('ai-status').className = 'positive';
+            document.getElementById('active-strategies').textContent = '3/3';
+            
+            showNotification('⚡ Trading Resumed', 'All strategies are now active.', 'success');
+        }
+
+        // REDUCE EXPOSURE Function
+        function reduceExposure() {
+            if (isEmergencyStopped) {
+                showNotification('System Locked', 'Cannot reduce exposure - system is in emergency stop mode', 'warning');
+                return;
+            }
+
+            const currentExp = parseFloat(document.getElementById('current-exposure').textContent);
+            const targetExp = (currentExp * 0.5).toFixed(1);
+            
+            showCustomModal(
+                '📉 Reduce Risk to 50%?',
+                `Current Exposure: ${currentExp}%<br>
+                Target Exposure: ${targetExp}%<br><br>
+                This will:<br>
+                ✂️ Reduce position sizes by 50%<br>
+                ✂️ Close lowest performing positions first<br>
+                ✅ Keep best performing positions<br>
+                ✅ Maintain stop losses on remaining`,
+                () => {
+                    const tbody = document.getElementById('positions-tbody');
+                    if (tbody) {
+                        const rows = tbody.querySelectorAll('tr[data-account]');
+                        const toClose = Math.floor(rows.length / 2);
+                        
+                        const positionData = Array.from(rows).map((row, index) => {
+                            const pnlCell = row.cells[5];
+                            const pnl = parseFloat(pnlCell.textContent.replace(/[+$,]/g, ''));
+                            return { row, pnl, index };
+                        });
+                        
+                        positionData.sort((a, b) => a.pnl - b.pnl);
+                        
+                        for (let i = 0; i < toClose; i++) {
+                            const position = positionData[i];
+                            setTimeout(() => {
+                                position.row.style.background = 'rgba(251, 191, 36, 0.1)';
+                                position.row.style.transform = 'translateX(100%)';
+                                position.row.style.opacity = '0';
+                                setTimeout(() => position.row.remove(), 300);
+                            }, i * 200);
+                        }
+                        
+                        setTimeout(() => {
+                            positions = positions.slice(toClose);
+                            
+                            document.getElementById('current-exposure').textContent = `${targetExp}%`;
+                            document.getElementById('current-exposure').classList.remove('warning');
+                            document.getElementById('current-exposure').classList.add('positive');
+                            document.getElementById('current-exposure-card').textContent = `${targetExp}%`;
+                            
+                            updateTotals();
+                            showNotification('📉 Risk Reduced', `Exposure reduced to ${targetExp}%`, 'success');
+                        }, toClose * 200 + 300);
+                    }
+                },
+                'Reduce Risk',
+                'modal-btn-primary'
+            );
+        }
+
+        // CLOSE ALL POSITIONS Function
+        function closeAllPositions() {
+            if (isEmergencyStopped) {
+                showNotification('System Locked', 'Cannot close positions - system is in emergency stop mode', 'warning');
+                return;
+            }
+
+            const tbody = document.getElementById('positions-tbody');
+            if (!tbody) return;
+            
+            const rows = tbody.querySelectorAll('tr[data-account]');
+            const count = rows.length;
+            
+            if (count === 0) {
+                showNotification('ℹ️ No Positions', 'No active positions to close', 'info');
+                return;
+            }
+            
+            let totalPnL = 0;
+            rows.forEach(row => {
+                const pnlCell = row.cells[5];
+                if (pnlCell) {
+                    totalPnL += parseFloat(pnlCell.textContent.replace(/[+$,]/g, ''));
+                }
+            });
+            
+            showCustomModal(
+                '⌛ Close All Positions?',
+                `Active Positions: ${count}<br>
+                Total P&L: ${totalPnL >= 0 ? '+' : ''}$${totalPnL.toFixed(2)}<br><br>
+                This will:<br>
+                ✂️ Close ALL positions at market price<br>
+                ✂️ Lock in current P&L<br>
+                ✂️ Clear all active trades`,
+                () => {
+                    rows.forEach((row, index) => {
+                        setTimeout(() => {
+                            row.style.background = 'rgba(16, 185, 129, 0.1)';
+                            row.style.transform = 'translateX(100%)';
+                            row.style.opacity = '0';
+                            setTimeout(() => row.remove(), 300);
+                        }, index * 150);
+                    });
+                    
+                    setTimeout(() => {
+                        positions = [];
+                        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #9ca3af;">No open positions</td></tr>';
+                        
+                        document.getElementById('current-exposure').textContent = '0.0%';
+                        document.getElementById('current-exposure').classList.remove('warning');
+                        document.getElementById('current-exposure').classList.add('positive');
+                        document.getElementById('current-exposure-card').textContent = '0.0%';
+                        
+                        updateTotals();
+                        showNotification('✅ Positions Closed', `${count} position(s) closed. Total P&L: ${totalPnL >= 0 ? '+' : ''}$${totalPnL.toFixed(2)}`, 'success');
+                    }, count * 150 + 300);
+                },
+                'Close All',
+                'modal-btn-primary'
+            );
+        }
+
+        // EXPOSURE CONTROL Functions
+        function adjustExposure(direction) {
+            if (isEmergencyStopped) {
+                showNotification('System Locked', 'Cannot adjust exposure - system is in emergency stop mode', 'warning');
+                return;
+            }
+
+            const currentTarget = parseFloat(document.getElementById('target-exposure').textContent);
+            let newTarget;
+            
+            if (direction === 'decrease') {
+                newTarget = Math.max(0.5, currentTarget - 0.5);
+            } else {
+                newTarget = Math.min(5.0, currentTarget + 0.5);
+            }
+            
+            document.getElementById('target-exposure').textContent = `${newTarget.toFixed(1)}%`;
+            
+            showNotification(
+                direction === 'decrease' ? '📉 Target Decreased' : '📈 Target Increased',
+                `New target exposure: ${newTarget.toFixed(1)}%`,
+                'info'
+            );
+        }
+
+        // AI SETTINGS Function
+        function openAISettings() {
+            if (isEmergencyStopped) {
+                showNotification('System Locked', 'Cannot access settings - system is in emergency stop mode', 'warning');
+                return;
+            }
+
+            const modalHTML = `
+                <div style="margin-bottom: 24px;">
+                    <h4 style="margin-bottom: 16px; color: #e5e7eb; font-size: 16px; font-weight: 600;">Risk Mode</h4>
+                    <div style="display: grid; gap: 12px;">
+                        <label style="display: flex; align-items: center; gap: 12px; padding: 16px; background: rgba(55, 65, 81, 0.2); border: 1px solid #374151; border-radius: 8px; cursor: pointer;">
+                            <input type="radio" name="risk-mode" value="conservative">
+                            <div>
+                                <div style="font-weight: 600;">Conservative (0.5-1% risk)</div>
+                                <div style="font-size: 12px; color: #9ca3af;">Lower risk, slower growth, higher safety</div>
+                            </div>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 12px; padding: 16px; background: rgba(55, 65, 81, 0.2); border: 1px solid #374151; border-radius: 8px; cursor: pointer;">
+                            <input type="radio" name="risk-mode" value="normal" checked>
+                            <div>
+                                <div style="font-weight: 600;">Normal (1-2% risk)</div>
+                                <div style="font-size: 12px; color: #9ca3af;">Balanced risk/reward, recommended</div>
+                            </div>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 12px; padding: 16px; background: rgba(55, 65, 81, 0.2); border: 1px solid #374151; border-radius: 8px; cursor: pointer;">
+                            <input type="radio" name="risk-mode" value="aggressive">
+                            <div>
+                                <div style="font-weight: 600;">Aggressive (2-3% risk)</div>
+                                <div style="font-size: 12px; color: #9ca3af;">Higher risk, faster growth potential</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <h4 style="margin-bottom: 12px; color: #e5e7eb; font-size: 14px; font-weight: 600;">Trading Parameters</h4>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                        <div>
+                            <label style="display: block; margin-bottom: 4px; font-size: 12px; color: #9ca3af;">Max Positions</label>
+                            <input type="number" value="6" min="1" max="20" style="width: 100%; padding: 6px 8px; background: rgba(55, 65, 81, 0.3); border: 1px solid #374151; border-radius: 4px; color: #e5e7eb; font-size: 13px;">
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 4px; font-size: 12px; color: #9ca3af;">Position Sizing</label>
+                            <select style="width: 100%; padding: 6px 8px; background: rgba(55, 65, 81, 0.3); border: 1px solid #374151; border-radius: 4px; color: #e5e7eb; font-size: 13px;">
+                                <option value="kelly" selected>Kelly Criterion</option>
+                                <option value="fixed">Fixed Risk %</option>
+                                <option value="volatility">Volatility-Based</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 4px; font-size: 12px; color: #9ca3af;">Stop Loss Method</label>
+                            <select style="width: 100%; padding: 6px 8px; background: rgba(55, 65, 81, 0.3); border: 1px solid #374151; border-radius: 4px; color: #e5e7eb; font-size: 13px;">
+                                <option value="dynamic" selected>Dynamic ATR-Based</option>
+                                <option value="fixed">Fixed Percentage</option>
+                                <option value="support">Support/Resistance</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 4px; font-size: 12px; color: #9ca3af;">Correlation Limit</label>
+                            <input type="number" value="0.7" min="0.1" max="1.0" step="0.1" style="width: 100%; padding: 6px 8px; background: rgba(55, 65, 81, 0.3); border: 1px solid #374151; border-radius: 4px; color: #e5e7eb; font-size: 13px;">
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <h4 style="margin-bottom: 12px; color: #e5e7eb; font-size: 14px; font-weight: 600;">Safety Features</h4>
+                    <div style="display: grid; gap: 8px;">
+                        <label style="display: flex; align-items: center; gap: 8px; color: #e5e7eb; font-size: 13px; cursor: pointer;">
+                            <input type="checkbox" checked style="margin: 0; transform: scale(1.1);">
+                            <span>News Filter (avoid trading during high-impact news)</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; color: #e5e7eb; font-size: 13px; cursor: pointer;">
+                            <input type="checkbox" checked style="margin: 0; transform: scale(1.1);">
+                            <span>Weekend Holding Protection</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; color: #e5e7eb; font-size: 13px; cursor: pointer;">
+                            <input type="checkbox" checked style="margin: 0; transform: scale(1.1);">
+                            <span>Daily Loss Limit Auto-Stop</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; color: #e5e7eb; font-size: 13px; cursor: pointer;">
+                            <input type="checkbox" style="margin: 0; transform: scale(1.1);">
+                            <span>After-Hours Trading (futures only)</span>
+                        </label>
+                    </div>
+                </div>
+            `;
+            
+            showCustomModal(
+                '⚙️ AI Risk Settings',
+                modalHTML,
+                () => {
+                    const selectedMode = document.querySelector('input[name="risk-mode"]:checked');
+                    if (selectedMode) {
+                        const riskMode = selectedMode.value;
+                        document.getElementById('risk-mode').textContent = riskMode.charAt(0).toUpperCase() + riskMode.slice(1);
+                        showNotification('Settings Saved', `Risk mode set to ${riskMode}`, 'success');
+                    }
+                },
+                'Save Settings',
+                'modal-btn-primary'
+            );
+        }
+
+        // Other helper functions
+        function initiateWithdrawal(account, amount) {
+            showNotification('Withdrawal Request', `Demo withdrawal of ${amount} from ${account}`, 'info');
+        }
+
+        function handleAlertClick(alertElement) {
+            alertElement.style.opacity = '0.5';
+            setTimeout(() => {
+                alertElement.style.transform = 'translateX(100%)';
+                setTimeout(() => alertElement.remove(), 300);
+            }, 100);
+        }
+
+        // Initialize Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            // Quick Action buttons
+            document.getElementById('emergency-btn').addEventListener('click', emergencyStop);
+            document.getElementById('emergency-stop-header').addEventListener('click', emergencyStop);
+            document.getElementById('pause-btn').addEventListener('click', pauseTrading);
+            document.getElementById('reduce-btn').addEventListener('click', reduceExposure);
+            document.getElementById('close-all-btn').addEventListener('click', closeAllPositions);
+            
+            // Exposure control buttons
+            document.getElementById('decrease-exposure-btn').addEventListener('click', () => adjustExposure('decrease'));
+            document.getElementById('increase-exposure-btn').addEventListener('click', () => adjustExposure('increase'));
+            
+            // AI Settings button
+            document.getElementById('ai-settings-btn').addEventListener('click', openAISettings);
+            
+            // Auto-scale toggle
+            document.getElementById('auto-scale-status').addEventListener('click', function() {
+                const currentStatus = this.textContent.includes('ON');
+                if (currentStatus) {
+                    this.textContent = 'OFF ⌛';
+                    this.className = 'negative';
+                    showNotification('Auto-Scale Disabled', 'Position sizing set to manual mode', 'warning');
+                } else {
+                    this.textContent = 'ON ✅';
+                    this.className = 'positive';
+                    showNotification('Auto-Scale Enabled', 'AI will automatically adjust position sizes', 'success');
+                }
+            });
+            
+            // Restart button (initially hidden)
+            const restartBtn = document.getElementById('restart-btn');
+            if (restartBtn) {
+                restartBtn.addEventListener('click', manualRestart);
+            }
+            
+            // Risk Report button
+            document.getElementById('risk-report-btn').addEventListener('click', showRiskReportModal);
+            
+            // Close modal on overlay click
+            document.getElementById('modalOverlay').addEventListener('click', (e) => {
+                if (e.target === document.getElementById('modalOverlay')) {
+                    closeCustomModal();
+                }
+            });
+            
+            // Handle window click for modals
+            window.onclick = function(event) {
+                const modal = document.getElementById('export-modal');
+                if (event.target === modal) {
+                    closeModal();
+                }
+            }
+            
+            // Add event listeners for editable fields in personal account
+            document.querySelectorAll('.editable').forEach(elem => {
+                elem.addEventListener('blur', function() {
+                    const updateType = this.dataset.update;
+                    const isPercentage = this.dataset.isPercentage === 'true';
+                    let value = parseFloat(this.textContent.trim().replace('%', ''));
+                    
+                    if (isNaN(value) || value < 0) {
+                        this.textContent = this.originalValue || '0';
+                        showNotification('Invalid Input', 'Please enter a valid positive number', 'danger');
+                        return;
+                    }
+                    
+                    // Update progress bars based on the field that was edited
+                    if (updateType === 'daily-limit') {
+                        const current = parseFloat(document.getElementById('daily-loss-current').textContent);
+                        const percentage = (current / value) * 100;
+                        const progressBar = document.getElementById('daily-limit-progress');
+                        const percentLabel = document.getElementById('daily-limit-percent');
+                        
+                        progressBar.style.width = `${Math.min(percentage, 100)}%`;
+                        progressBar.className = percentage < 50 ? 'progress-fill progress-safe' : 
+                                               percentage < 80 ? 'progress-fill progress-warning' : 
+                                               'progress-fill progress-danger';
+                        
+                        percentLabel.textContent = `${percentage.toFixed(1)}% ${percentage >= 80 ? '⚠️' : '✅'}`;
+                        percentLabel.className = percentage >= 80 ? 'warning' : 'positive';
+                        
+                    } else if (updateType === 'monthly-goal') {
+                        const current = parseFloat(document.getElementById('monthly-current').textContent);
+                        const percentage = (current / value) * 100;
+                        const progressBar = document.getElementById('monthly-goal-progress');
+                        const percentLabel = document.getElementById('monthly-goal-percent');
+                        
+                        progressBar.style.width = `${Math.min(percentage, 100)}%`;
+                        progressBar.className = percentage < 50 ? 'progress-fill progress-safe' : 
+                                               percentage < 80 ? 'progress-fill progress-warning' : 
+                                               'progress-fill progress-danger';
+                        
+                        percentLabel.textContent = `${percentage.toFixed(1)}% 📈`;
+                        percentLabel.className = percentage >= 80 ? 'positive' : percentage >= 50 ? 'warning' : 'neutral';
+                        
+                    } else if (updateType === 'risk-per-trade' || updateType === 'risk-per-trade-max') {
+                        const currentRisk = parseFloat(document.querySelector('[data-update="risk-per-trade"]').textContent);
+                        const maxRisk = parseFloat(document.querySelector('[data-update="risk-per-trade-max"]').textContent);
+                        const percentage = (currentRisk / maxRisk) * 100;
+                        const progressBar = document.getElementById('risk-per-trade-progress');
+                        const statusLabel = document.getElementById('risk-per-trade-status');
+                        
+                        progressBar.style.width = `${Math.min(percentage, 100)}%`;
+                        progressBar.className = percentage < 50 ? 'progress-fill progress-safe' : 
+                                               percentage < 80 ? 'progress-fill progress-warning' : 
+                                               'progress-fill progress-danger';
+                        
+                        if (percentage < 50) {
+                            statusLabel.textContent = 'Safe ✅';
+                            statusLabel.className = 'positive';
+                        } else if (percentage < 80) {
+                            statusLabel.textContent = 'Moderate ⚠️';
+                            statusLabel.className = 'warning';
+                        } else {
+                            statusLabel.textContent = 'High Risk ⌛';
+                            statusLabel.className = 'negative';
+                        }
+                    }
+                    
+                    showNotification('Value Updated', `${this.dataset.account}: ${value}${isPercentage ? '%' : ''}`, 'success');
+                });
+                
+                elem.addEventListener('focus', function() {
+                    this.originalValue = this.textContent;
+                });
+                
+                elem.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        this.blur();
+                    }
+                });
+            });
+            
+            // Initialize totals
+            updateTotals();
+            
+            showNotification('✅ System Ready', 'Risk Monitor v81 fully loaded!', 'success');
+        });
+    </script>
+</body>
+</html>
